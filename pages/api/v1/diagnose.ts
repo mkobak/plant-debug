@@ -30,7 +30,9 @@ export default async function handler(
   }
 
   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+  const modelPro = genAI.getGenerativeModel({ model: 'gemini-2.5-pro' });
+  const modelFlash = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+
 
   try {
     const form = formidable({});
@@ -66,17 +68,64 @@ export default async function handler(
     if (plantAge?.[0]) contextLines.push(`- Plant Age: ${plantAge[0]}`);
     if (description?.[0]) contextLines.push(`- User Description: ${description[0]}`);
 
+    // Step 1: Get three diagnoses from Gemini
+    const diagnosisPrompt = `
+      You are an expert botanist. Based on the images and context, what are the most likely possible diagnoses for the plant's issue? Provide up to three diagnoses if multiple options seem likely.
+      Only reply with the concrete diagnosis names, separated by commas, and nothing else. If no plant appears in the images, respond with 'No plant detected'. If the plant is healthy, respond with 'Plant is healthy'.
+      User provided context: \n\n${contextLines.length ? contextLines.join('\n') : 'No further information was provided.'}
+      `;
+    const imageParts = await Promise.all(imageFiles.map(fileToGenerativePart));
+    const getDiagnosis = async () => {
+      console.log("Gemini diagnosis prompt:", diagnosisPrompt);
+      const result = await modelFlash.generateContent({
+        contents: [{ role: "user", parts: [{ text: diagnosisPrompt }, ...imageParts] }],
+        generationConfig: { temperature: 0.2, topP: 0.5 }
+      });
+      const response = await result.response;
+      // Try to extract diagnosis from the response
+      let diagnosis = "";
+      try {
+        diagnosis = response.text().trim();
+      } catch {
+        diagnosis = "";
+      }
+      console.log("Gemini diagnosis extracted:", diagnosis);
+      return diagnosis;
+    };
+
+    const diagnosisResults = await Promise.all([getDiagnosis(), getDiagnosis(), getDiagnosis()]);
+    // Step 1.5: Group and rank diagnoses by frequency
+    const rankingPrompt = `Group and rank these plant diagnoses by frequency. Output a ranked list, most frequent first. Only reply with the ranked list, comma-separated. Diagnoses: ${diagnosisResults.join(', ')}`;
+    console.log("Gemini ranking prompt:", rankingPrompt);
+    const rankingResult = await modelFlash.generateContent({
+      contents: [{ role: "user", parts: [{ text: rankingPrompt }] }],
+      generationConfig: { temperature: 0.1, topP: 0.5 }
+    });
+    const rankingResponse = await rankingResult.response;
+    let rankedDiagnoses = "";
+    try {
+      rankedDiagnoses = rankingResponse.text().trim();
+    } catch {
+      rankedDiagnoses = "";
+    }
+    console.log("Gemini ranked diagnoses:", rankedDiagnoses);
+
+    // Step 2: Main prompt with structured output, including previous diagnoses
     const prompt = `
       You are an expert botanist and plant pathologist.
       Your answers should be concise, clear, and actionable.
       You rate your confidence in your diagnosis realistically given the available information.
-      In your response, refer to the user as "you" or "your" and NOT as "the user".
-      You also include subtle funny computer science references in your responses. Don't make it too obvious, but make some subtle references that a programmer would understand. Avoid using quotation marks.
+      In your response, refer to the user as 'you' and NOT as 'the user'.
+      You also include subtle funny computer science references in your responses. Don't make it too obvious, but make subtle references that a programmer would understand. Avoid using quotation marks and starting sentences with 'think of it as' or 'this/it is like'.
       The user has provided image(s) and some optional information about their sick plant:
       ${contextLines.length ? contextLines.join('\n') : 'No further information was provided.'}
 
+      The following diagnoses were ranked by frequency by other plant experts: ${rankedDiagnoses}.
+      Consider this ranked list in your answer. Do not mention the other experts and their diagnoses in your response.
+
       Please provide a diagnosis using the 'plant_diagnosis' function call.
     `;
+    console.log("Gemini structured prompt:", prompt);
 
     // Define the function tool for structured output
     const tools = [
@@ -108,11 +157,7 @@ export default async function handler(
       }
     ] as unknown as import('@google/generative-ai').Tool[];
 
-    const imageParts = await Promise.all(
-      imageFiles.map(fileToGenerativePart)
-    );
-
-    const result = await model.generateContent({
+    const result = await modelPro.generateContent({
       contents: [
         {
           role: "user",
@@ -124,23 +169,26 @@ export default async function handler(
       ],
       tools,
       generationConfig: {
-        temperature: 0.1,
-        topP: 0.5
+        temperature: 0.1, // Lower for more consistent answers
+        topP: 0.5         // Optional: lower for less randomness
       }
     });
     const response = await result.response;
+    console.log("Gemini structured raw response:", response.candidates?.[0]?.content?.parts?.[0]?.functionCall);
     let jsonResponse;
     try {
+      // Gemini function calling responses are in response.candidates[0].content.parts[0].functionCall.args
       const functionCall = response.candidates?.[0]?.content?.parts?.[0]?.functionCall;
       if (functionCall && functionCall.args) {
         jsonResponse = functionCall.args;
+        console.log("Gemini AI diagnosis response:", JSON.stringify(jsonResponse, null, 2));
         res.status(200).json(jsonResponse);
       } else {
         throw new Error("No structured function call response from Gemini.");
       }
     } catch (e) {
       console.error("Failed to parse Gemini structured response:", e, response);
-      res.status(500).json({ error: "Failed to get a valid diagnosis, please try again. If the error persists, please change your inputs." });
+      res.status(500).json({ error: "Failed to get a valid diagnosis, please try again. If the error persists, please provide more/different images and context." });
     }
 
   } catch (error: any) {
