@@ -9,10 +9,27 @@ interface ImageUploaderProps {
 const ImageUploader: React.FC<ImageUploaderProps> = ({ files, onFilesChange }) => {
   const [isDragging, setIsDragging] = useState(false);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const newFiles = Array.from(e.target.files);
-      onFilesChange([...files, ...newFiles]);
+  // Handle file selection for a specific slot
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, slot: number) => {
+    if (e.target.files && e.target.files[0]) {
+      const newFile = e.target.files[0];
+      const updatedFiles = [...files];
+      updatedFiles[slot] = newFile;
+      onFilesChange(updatedFiles.filter(Boolean));
+    }
+  };
+
+  // Drag and drop for a specific slot
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>, slot: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const newFile = e.dataTransfer.files[0];
+      const updatedFiles = [...files];
+      updatedFiles[slot] = newFile;
+      onFilesChange(updatedFiles.filter(Boolean));
+      e.dataTransfer.clearData();
     }
   };
 
@@ -28,46 +45,51 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ files, onFilesChange }) =
     setIsDragging(false);
   };
 
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const removeFile = (slot: number) => {
+    const updatedFiles = [...files];
+    updatedFiles[slot] = undefined as any;
+    onFilesChange(updatedFiles.filter(Boolean));
   };
 
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      const newFiles = Array.from(e.dataTransfer.files);
-      onFilesChange([...files, ...newFiles]);
-      e.dataTransfer.clearData();
-    }
-  };
-
-  const removeFile = (index: number) => {
-    onFilesChange(files.filter((_, i) => i !== index));
-  };
-
+  // Render 3 slots
   return (
     <div className={styles.uploaderContainer}>
-      <div
-        className={`${styles.dropzone} ${isDragging ? styles.dragging : ''}`}
-        onDragEnter={handleDragEnter}
-        onDragLeave={handleDragLeave}
-        onDragOver={handleDragOver}
-        onDrop={handleDrop}
-        onClick={() => document.getElementById('fileInput')?.click()}
-      >
-        <input type="file" id="fileInput" multiple onChange={handleFileChange} accept="image/png, image/jpeg, image/webp, image/heic" className={styles.fileInput} />
-        <p>Drag & drop images here, or click to select files</p>
-      </div>
-      <div className={styles.previewContainer}>
-        {files.map((file, index) => (
-          <div key={index} className={styles.previewItem}>
-            <img src={URL.createObjectURL(file)} alt={`preview ${index}`} className={styles.previewImage} />
-            <button type="button" onClick={() => removeFile(index)} className={styles.removeButton}>&times;</button>
+      <div className={styles.previewContainer} style={{ justifyContent: 'flex-start' }}>
+        {[0, 1, 2].map((slot) => (
+          <div
+            key={slot}
+            className={styles.previewItem}
+            style={{ border: files[slot] ? 'none' : '2px dashed #ccc', background: files[slot] ? 'none' : '#fafbfc', position: 'relative', cursor: 'pointer' }}
+            onClick={() => document.getElementById(`fileInput${slot}`)?.click()}
+            onDragEnter={handleDragEnter}
+            onDragLeave={handleDragLeave}
+            onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+            onDrop={(e) => handleDrop(e, slot)}
+          >
+            {files[slot] ? (
+              <>
+                <img src={URL.createObjectURL(files[slot])} alt={`preview ${slot}`} className={styles.previewImage} />
+                <button type="button" onClick={(e) => { e.stopPropagation(); removeFile(slot); }} className={styles.removeButton}>&times;</button>
+              </>
+            ) : (
+              <>
+                <input
+                  type="file"
+                  id={`fileInput${slot}`}
+                  onChange={(e) => handleFileChange(e, slot)}
+                  accept="image/png, image/jpeg, image/webp, image/heic"
+                  className={styles.fileInput}
+                />
+                <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#bbb', fontSize: 24 }}>
+                  +
+                </div>
+              </>
+            )}
           </div>
         ))}
+      </div>
+      <div style={{ color: '#888', fontSize: '0.98em', marginTop: 8, textAlign: 'left' }}>
+        Drag & drop or click a slot to select an image. You can upload up to 3 images.
       </div>
     </div>
   );

@@ -8,19 +8,33 @@ import ContextForm from '../components/ContextForm';
 import { DiagnosisResult } from '../components/DiagnosisResult';
 
 const Home: NextPage = () => {
+  const [detailsOpen, setDetailsOpen] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const [formState, setFormState] = useState<DiagnosisFormState>({
     plantType: '',
     location: '',
-    watering: '',
+    wateringFrequency: '',
+    wateringAmount: '',
+    wateringMethod: '',
     sunlight: '',
+    sunlightHours: '',
+    soilType: '',
+    fertilizer: '',
+    humidity: '',
+    temperature: '',
+    pests: '',
+    symptoms: [],
+    potDetails: '',
+    recentChanges: '',
+    plantAge: '',
+    description: '',
   });
   const [diagnosis, setDiagnosis] = useState<DiagnosisResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleFormChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setFormState((prevState) => ({ ...prevState, [name]: value }));
@@ -41,7 +55,11 @@ const Home: NextPage = () => {
       formData.append('images', file);
     });
     Object.entries(formState).forEach(([key, value]) => {
-      formData.append(key, value);
+      if (Array.isArray(value)) {
+        value.forEach((v) => formData.append(key, v));
+      } else {
+        formData.append(key, value);
+      }
     });
 
     try {
@@ -68,7 +86,7 @@ const Home: NextPage = () => {
     <div className={styles.container}>
       <Head>
         <title>Plant Debugger</title>
-        <meta name="description" content="Debug your plants with AI" />
+        <meta name="description" content="Debug your plants" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -78,7 +96,7 @@ const Home: NextPage = () => {
             Plant Debugger
           </h1>
           <p className={styles.description}>
-            Upload pictures of your sick plant and provide some context to start debugging.
+            Upload pictures of your sad plant and provide some context to start debugging.
           </p>
         </header>
 
@@ -86,19 +104,80 @@ const Home: NextPage = () => {
           <div className={styles.formSection}>
             <h2 className={styles.sectionTitle}>1. Upload Images</h2>
             <div style={{ marginBottom: '0.5rem', color: '#888', fontSize: '0.98em' }}>
-              <strong>Tip:</strong> For best results, upload clear, well-lit photos showing the affected parts of your plant (leaves, stems, soil). Avoid blurry or dark images.
+              <strong>Tip:</strong> For best results, upload clear, well-lit photos showing the affected parts of your plant. Avoid blurry or dark images.
             </div>
             <ImageUploader files={files} onFilesChange={setFiles} />
           </div>
 
           <div className={styles.formSection}>
-            <h2 className={styles.sectionTitle}>2. Provide Context</h2>
-            <ContextForm formState={formState} onFormChange={handleFormChange} />
+            <h2 className={styles.sectionTitle}>2. Provide Context (optional)</h2>
+            {/* Show only Plant Type and Describe the problem, rest are hidden in expandable section */}
+            <ContextForm formState={{ ...formState, location: '', wateringFrequency: '', wateringAmount: '', wateringMethod: '', sunlight: '', sunlightHours: '', soilType: '', fertilizer: '', humidity: '', temperature: '', pests: '', symptoms: [], potDetails: '', recentChanges: '', plantAge: '' }} onFormChange={handleFormChange} fields={['plantType', 'description']} />
+            <details style={{ marginTop: '1rem' }} open={detailsOpen} onToggle={e => setDetailsOpen(e.currentTarget.open)}>
+              {/* Only one big chevron, rotates on expand */}
+              <summary
+                style={{
+                  cursor: 'pointer',
+                  fontWeight: 600,
+                  fontSize: '1.15em',
+                  color: '#444',
+                  padding: '0.7em 0.7em 0.7em 0.9em',
+                  background: '#f7f7fa',
+                  borderRadius: '6px',
+                  boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+                  border: '1px solid #e0e0e0',
+                  position: 'relative',
+                  transition: 'background 0.2s',
+                  userSelect: 'none',
+                }}
+                onMouseOver={e => (e.currentTarget.style.background = '#ececf6')}
+                onMouseOut={e => (e.currentTarget.style.background = '#f7f7fa')}
+              >
+              Provide more context
+              </summary>
+              <div style={{ marginTop: '1em', display: 'flex', flexDirection: 'column', gap: '1.2em' }}>
+                <ContextForm formState={formState} onFormChange={handleFormChange} fields={['location', 'wateringFrequency', 'wateringAmount', 'wateringMethod', 'sunlight', 'sunlightHours', 'soilType', 'fertilizer', 'humidity', 'temperature', 'pests', 'symptoms', 'potDetails', 'recentChanges', 'plantAge']} />
+              </div>
+            </details>
           </div>
 
-          <button type="submit" disabled={isLoading} className={styles.submitButton}>
-            {isLoading ? 'Diagnosing...' : 'Get Diagnosis'}
-          </button>
+          <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+            <button type="submit" disabled={isLoading} className={styles.submitButton}>
+              {isLoading ? 'Debugging...' : 'Debug'}
+            </button>
+            <button
+              type="button"
+              className={styles.submitButton}
+              style={{ background: '#eee', color: '#333', border: '1px solid #ccc' }}
+              onClick={() => {
+                setFiles([]);
+                setFormState({
+                  plantType: '',
+                  location: '',
+                  wateringFrequency: '',
+                  wateringAmount: '',
+                  wateringMethod: '',
+                  sunlight: '',
+                  sunlightHours: '',
+                  soilType: '',
+                  fertilizer: '',
+                  humidity: '',
+                  temperature: '',
+                  pests: '',
+                  symptoms: [],
+                  potDetails: '',
+                  recentChanges: '',
+                  plantAge: '',
+                  description: '',
+                });
+                setDiagnosis(null);
+                setError(null);
+              }}
+              disabled={isLoading}
+            >
+              Reset
+            </button>
+          </div>
         </form>
 
         {isLoading && (

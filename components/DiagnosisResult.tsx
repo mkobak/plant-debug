@@ -7,7 +7,7 @@ interface DiagnosisResultProps {
   diagnosis: DiagnosisResponse;
 }
 
-const getConfidenceColor = (confidence: DiagnosisResponse['confidence']) => {
+const getConfidenceColor = (confidence: DiagnosisResponse['primaryConfidence'] | undefined) => {
   switch (confidence) {
     case 'High':
       return '#28a745';
@@ -24,29 +24,67 @@ export const DiagnosisResult: React.FC<DiagnosisResultProps> = ({ diagnosis }) =
   return (
     <div className={styles.resultContainer}>
       <div className={styles.header}>
-        <h2>Diagnosis: {diagnosis.diagnosis}</h2>
+        <h2 style={{ marginBottom: 0 }}>Plant Identified: {diagnosis.plant}</h2>
+      </div>
+
+      <div className={styles.header}>
+        <h2 style={{ marginBottom: 0 }}>Primary Diagnosis: {diagnosis.primaryDiagnosis}</h2>
         <span
           className={styles.confidence}
-          style={{ backgroundColor: getConfidenceColor(diagnosis.confidence) }}
+          style={{ backgroundColor: getConfidenceColor(diagnosis.primaryConfidence) }}
         >
-          {diagnosis.confidence} Confidence
+          {diagnosis.primaryConfidence} Confidence
         </span>
       </div>
 
       <div className={styles.section}>
         <h3>Reasoning</h3>
-        <ReactMarkdown>{diagnosis.reasoning}</ReactMarkdown>
+        <ReactMarkdown>{diagnosis.primaryReasoning}</ReactMarkdown>
       </div>
 
       <div className={styles.section}>
         <h3>Treatment Plan</h3>
-        <ReactMarkdown>{diagnosis.treatmentPlan}</ReactMarkdown>
+        <ReactMarkdown>{diagnosis.primaryTreatmentPlan}</ReactMarkdown>
       </div>
 
       <div className={styles.section}>
         <h3>Prevention Tips</h3>
-        <ReactMarkdown>{diagnosis.preventionTips}</ReactMarkdown>
+        <ReactMarkdown>{diagnosis.primaryPreventionTips}</ReactMarkdown>
       </div>
+
+      {diagnosis.secondaryDiagnosis && diagnosis.secondaryDiagnosis.trim() && (
+        <div className={styles.section} style={{ marginTop: 32, borderTop: '2px solid #eee', paddingTop: 24 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 8 }}>
+            <h2 style={{ color: '#888', marginBottom: 0, marginRight: 0 }}>Secondary Diagnosis: {diagnosis.secondaryDiagnosis}</h2>
+            {diagnosis.secondaryConfidence && (
+              <span
+                className={styles.confidence}
+                style={{ backgroundColor: getConfidenceColor(diagnosis.secondaryConfidence) }}
+              >
+                {diagnosis.secondaryConfidence} Confidence
+              </span>
+            )}
+          </div>
+          {diagnosis.secondaryReasoning && (
+            <div style={{ marginTop: 12 }}>
+              <h3>Reasoning</h3>
+              <ReactMarkdown>{diagnosis.secondaryReasoning}</ReactMarkdown>
+            </div>
+          )}
+          {diagnosis.secondaryTreatmentPlan && (
+            <div style={{ marginTop: 12 }}>
+              <h3>Treatment Plan</h3>
+              <ReactMarkdown>{diagnosis.secondaryTreatmentPlan}</ReactMarkdown>
+            </div>
+          )}
+          {diagnosis.secondaryPreventionTips && (
+            <div style={{ marginTop: 12 }}>
+              <h3>Prevention Tips</h3>
+              <ReactMarkdown>{diagnosis.secondaryPreventionTips}</ReactMarkdown>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

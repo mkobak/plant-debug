@@ -30,39 +30,51 @@
 
 .previewContainer {
   display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
+  flex-direction: row;
+  gap: 2rem;
   margin-top: 1rem;
+  width: 100%;
 }
 
 .previewItem {
   position: relative;
-  width: 100px;
-  height: 100px;
+  flex: 1 1 0;
+  aspect-ratio: 1 / 1;
+  min-width: 180px;
+  max-width: 400px;
+  height: auto;
+  border-radius: 12px;
+  background: #fafbfc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: border 0.2s;
 }
 
 .previewImage {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 8px;
+  border-radius: 12px;
 }
 
 .removeButton {
   position: absolute;
-  top: -5px;
-  right: -5px;
+  top: 8px;
+  right: 8px;
   background: #dc3545;
   color: white;
   border: none;
   border-radius: 50%;
-  width: 20px;
-  height: 20px;
+  width: 32px;
+  height: 32px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+  font-size: 22px;
   line-height: 1;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  box-shadow: 0 1px 6px rgba(0,0,0,0.18);
+  z-index: 10;
 }
