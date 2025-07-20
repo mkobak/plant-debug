@@ -23,7 +23,7 @@ Test at [plant-debug.vercel.app](https://plant-debug.vercel.app/). To run locall
 ### Prerequisites
 - Node.js
 - npm
-- generate a Gemini API key at [aistudio.google.com/apikey](https://aistudio.google.com/apikey)and store in .env.local as GEMINI_API_KEY="xyz"
+- generate a Gemini API key at [aistudio.google.com/apikey](https://aistudio.google.com/apikey) and store in .env.local as GEMINI_API_KEY="xyz"
 
 ### Installation
 ```bash
