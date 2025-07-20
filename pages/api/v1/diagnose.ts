@@ -20,18 +20,27 @@ const fileToGenerativePart = async (file: File) => {
     let resizedBuffer = buffer;
     let width;
     try {
-      const image = sharp(buffer);
-      const metadata = await image.metadata();
+      // Get initial width
+      let metadata = await sharp(buffer).metadata();
       width = metadata.width;
       // Iteratively reduce quality and/or resize until <=1MB
-      while (resizedBuffer.length > 1024 * 1024 && quality >= 40) {
-        let resizeWidth = width ? Math.round(width * 0.9) : undefined;
+      while (resizedBuffer.length > 1024 * 1024 && quality >= 40 && width && width > 200) {
+        let resizeWidth = Math.max(Math.round(width * 0.85), 200);
         resizedBuffer = await sharp(resizedBuffer)
           .resize(resizeWidth)
           .jpeg({ quality })
           .toBuffer();
         quality -= 10;
-        width = resizeWidth;
+        // Get new width for next iteration
+        metadata = await sharp(resizedBuffer).metadata();
+        width = metadata.width;
+      }
+      // Final fallback: if still >1MB, force resize to 800px width and quality 40
+      if (resizedBuffer.length > 1024 * 1024) {
+        resizedBuffer = await sharp(resizedBuffer)
+          .resize(800)
+          .jpeg({ quality: 40 })
+          .toBuffer();
       }
       buffer = resizedBuffer;
     } catch (err) {
