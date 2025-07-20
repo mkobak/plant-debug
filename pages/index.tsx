@@ -266,6 +266,9 @@ const Home: NextPage = () => {
               Plant Debugger
             </h1>
           </div>
+          <p className={styles.description}>
+              Upload pictures of your sad plant and provide some context to start debugging.
+            </p>
         </header>
 
         {renderTabBar()}
