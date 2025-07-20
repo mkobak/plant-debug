@@ -10,11 +10,11 @@ interface DiagnosisResultProps {
 const getConfidenceColor = (confidence: DiagnosisResponse['primaryConfidence'] | undefined) => {
   switch (confidence) {
     case 'High':
-      return '#28a745';
+      return '#308300';
     case 'Medium':
-      return '#ffc107';
+      return '#ecb100ff';
     case 'Low':
-      return '#dc3545';
+      return '#b60012ff';
     default:
       return '#6c757d';
   }
@@ -26,9 +26,10 @@ export const DiagnosisResult: React.FC<DiagnosisResultProps> = ({ diagnosis }) =
       <div className={styles.header}>
         <h2 style={{ marginBottom: 0 }}>Plant Identified: {diagnosis.plant}</h2>
       </div>
-
       <div className={styles.header}>
         <h2 style={{ marginBottom: 0 }}>Primary Diagnosis: {diagnosis.primaryDiagnosis}</h2>
+      </div>
+      <div className={styles.header}>
         <span
           className={styles.confidence}
           style={{ backgroundColor: getConfidenceColor(diagnosis.primaryConfidence) }}
@@ -55,7 +56,9 @@ export const DiagnosisResult: React.FC<DiagnosisResultProps> = ({ diagnosis }) =
       {diagnosis.secondaryDiagnosis && diagnosis.secondaryDiagnosis.trim() && (
         <div className={styles.section} style={{ marginTop: 32, borderTop: '2px solid #eee', paddingTop: 24 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 8 }}>
-            <h2 style={{ color: '#888', marginBottom: 0, marginRight: 0 }}>Secondary Diagnosis: {diagnosis.secondaryDiagnosis}</h2>
+            <h2 style={{ color: '#888', marginBottom: 15, marginRight: 0 }}>Secondary Diagnosis: {diagnosis.secondaryDiagnosis}</h2>
+          </div>
+          <div className={styles.header}>
             {diagnosis.secondaryConfidence && (
               <span
                 className={styles.confidence}

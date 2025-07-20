@@ -8,6 +8,7 @@ import ContextForm from '../components/ContextForm';
 import { DiagnosisResult } from '../components/DiagnosisResult';
 
 const Home: NextPage = () => {
+  const [activeTab, setActiveTab] = useState<0 | 1 | 2>(0);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const [formState, setFormState] = useState<DiagnosisFormState>({
@@ -49,6 +50,7 @@ const Home: NextPage = () => {
     setIsLoading(true);
     setError(null);
     setDiagnosis(null);
+    setActiveTab(2); // Jump to results tab immediately
 
     const formData = new FormData();
     files.forEach((file) => {
@@ -82,6 +84,172 @@ const Home: NextPage = () => {
     }
   };
 
+  // Tab bar
+  const tabNames = [
+    '1. Upload images',
+    '2. Provide details',
+    '3. Diagnosis results',
+  ];
+
+  // Reset handler
+  const handleReset = () => {
+    setFiles([]);
+    setFormState({
+      plantType: '',
+      location: '',
+      wateringFrequency: '',
+      wateringAmount: '',
+      wateringMethod: '',
+      sunlight: '',
+      sunlightHours: '',
+      soilType: '',
+      fertilizer: '',
+      humidity: '',
+      temperature: '',
+      pests: '',
+      symptoms: [],
+      potDetails: '',
+      recentChanges: '',
+      plantAge: '',
+      description: '',
+    });
+    setDiagnosis(null);
+    setError(null);
+    setActiveTab(0);
+  };
+
+  // Tab content renderers
+  const renderUploadTab = () => (
+    <form className={styles.form} onSubmit={e => e.preventDefault()}>
+      <div className={styles.formSection}>
+        <h2 className={styles.sectionTitle}>1. Upload images</h2>
+        <div style={{ marginBottom: '0.5rem', color: '#888', fontSize: '0.98em' }}>
+          <strong>Tip:</strong> For best results, upload clear, well-lit photos showing the affected parts of your plant. Avoid blurry or dark images.
+        </div>
+        <ImageUploader files={files} onFilesChange={setFiles} />
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '2rem', marginBottom: '1rem', width: '100%' }}>
+
+        <button
+          type="button"
+          className={styles.submitButton}
+          style={{ background: '#eee', color: '#333', border: '1px solid #ccc' }}
+          onClick={handleReset}
+        >
+          Reset
+        </button>
+        <button
+          type="button"
+          className={styles.submitButton}
+          disabled={files.length === 0}
+          onClick={() => setActiveTab(1)}
+        >
+          Next
+        </button>
+      </div>
+    </form>
+  );
+
+  const renderInfoTab = () => (
+    <form onSubmit={handleSubmit} className={styles.form} style={{ width: '100%' }}>
+      <div className={styles.formSection} style={{ width: '100%' }}>
+        <h2 className={styles.sectionTitle}>2. Provide details (optional)</h2>
+        <ContextForm formState={{ ...formState, location: '', wateringFrequency: '', wateringAmount: '', wateringMethod: '', sunlight: '', sunlightHours: '', soilType: '', fertilizer: '', humidity: '', temperature: '', pests: '', symptoms: [], potDetails: '', recentChanges: '', plantAge: '' }} onFormChange={handleFormChange} fields={['plantType', 'description']} />
+        <details style={{ marginTop: '0.5rem', width: '100%' }} open={detailsOpen} onToggle={e => setDetailsOpen(e.currentTarget.open)}>
+          <summary
+            style={{
+              cursor: 'pointer',
+              fontWeight: 600,
+              fontSize: '1.15em',
+              color: '#444',
+              padding: '0.7em 0.7em 0.7em 0.9em',
+              background: '#f7f7fa',
+              borderRadius: '6px',
+              boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+              border: '1px solid #e0e0e0',
+              position: 'relative',
+              transition: 'background 0.2s',
+              userSelect: 'none',
+              width: '100%',
+              boxSizing: 'border-box',
+            }}
+            onMouseOver={e => (e.currentTarget.style.background = '#ececf6')}
+            onMouseOut={e => (e.currentTarget.style.background = '#f7f7fa')}
+          >
+            Provide more information
+          </summary>
+          <div style={{ marginTop: '1em', display: 'flex', flexDirection: 'column', gap: '1em', width: '100%' }}>
+            <ContextForm formState={formState} onFormChange={handleFormChange} fields={['location', 'wateringFrequency', 'wateringAmount', 'wateringMethod', 'sunlight', 'sunlightHours', 'soilType', 'fertilizer', 'humidity', 'temperature', 'pests', 'symptoms', 'potDetails', 'recentChanges', 'plantAge']} />
+          </div>
+        </details>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '2rem', marginBottom: '1rem', width: '100%' }}>
+        <button
+          type="button"
+          className={styles.submitButton}
+          style={{ background: '#eee', color: '#333', border: '1px solid #ccc' }}
+          onClick={handleReset}
+        >
+          Reset
+        </button>
+        <button
+          type="submit"
+          className={styles.submitButton}
+          disabled={isLoading}
+        >
+          {isLoading ? 'Debugging...' : 'Debug'}
+        </button>
+      </div>
+    </form>
+  );
+
+  const renderDiagnosisTab = () => (
+    <>
+      <div>
+        {isLoading && (
+          <div className={styles.loading}>
+            <div className={styles.spinner}></div>
+            <p>Debugging your plant... this may take a moment.</p>
+          </div>
+        )}
+        {error && <p className={styles.error}>{error}</p>}
+        {diagnosis && <DiagnosisResult diagnosis={diagnosis} />}
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '2rem', marginBottom: '1rem', width: '100%' }}>
+        <button
+          type="button"
+          className={styles.submitButton}
+          style={{ background: '#eee', color: '#333', border: '1px solid #ccc' }}
+          onClick={handleReset}
+        >
+          Reset
+        </button>
+      </div>
+    </>
+  );
+
+  // Tab bar component
+  const renderTabBar = () => (
+    <nav className={styles.tabBar}>
+      {tabNames.map((name, idx) => {
+        const enabled =
+          (idx === 0) ||
+          (idx === 1 && files.length > 0) ||
+          (idx === 2 && diagnosis);
+        return (
+          <button
+            key={name}
+            className={styles.tabButton + (activeTab === idx ? ' ' + styles.activeTab : '')}
+            disabled={!enabled}
+            onClick={() => enabled && setActiveTab(idx as 0 | 1 | 2)}
+          >
+            {name}
+          </button>
+        );
+      })}
+    </nav>
+  );
+
   return (
     <div className={styles.container}>
       <Head>
@@ -98,99 +266,15 @@ const Home: NextPage = () => {
               Plant Debugger
             </h1>
           </div>
-          <p className={styles.description}>
-            Upload pictures of your sad plant and provide some additional information to start debugging.
-          </p>
         </header>
 
-        <form onSubmit={handleSubmit} className={styles.form}>
-          <div className={styles.formSection}>
-            <h2 className={styles.sectionTitle}>1. Upload images</h2>
-            <div style={{ marginBottom: '0.5rem', color: '#888', fontSize: '0.98em' }}>
-              <strong>Tip:</strong> For best results, upload clear, well-lit photos showing the affected parts of your plant. Avoid blurry or dark images.
-            </div>
-            <ImageUploader files={files} onFilesChange={setFiles} />
-          </div>
+        {renderTabBar()}
 
-          <div className={styles.formSection}>
-            <h2 className={styles.sectionTitle}>2. Provide more information (optional)</h2>
-            <ContextForm formState={{ ...formState, location: '', wateringFrequency: '', wateringAmount: '', wateringMethod: '', sunlight: '', sunlightHours: '', soilType: '', fertilizer: '', humidity: '', temperature: '', pests: '', symptoms: [], potDetails: '', recentChanges: '', plantAge: '' }} onFormChange={handleFormChange} fields={['plantType', 'description']} />
-            <details style={{ marginTop: '0.5rem' }} open={detailsOpen} onToggle={e => setDetailsOpen(e.currentTarget.open)}>
-              <summary
-                style={{
-                  cursor: 'pointer',
-                  fontWeight: 600,
-                  fontSize: '1.15em',
-                  color: '#444',
-                  padding: '0.7em 0.7em 0.7em 0.9em',
-                  background: '#f7f7fa',
-                  borderRadius: '6px',
-                  boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
-                  border: '1px solid #e0e0e0',
-                  position: 'relative',
-                  transition: 'background 0.2s',
-                  userSelect: 'none',
-                }}
-                onMouseOver={e => (e.currentTarget.style.background = '#ececf6')}
-                onMouseOut={e => (e.currentTarget.style.background = '#f7f7fa')}
-              >
-              Provide even more information
-              </summary>
-              <div style={{ marginTop: '1em', display: 'flex', flexDirection: 'column', gap: '1em' }}>
-                <ContextForm formState={formState} onFormChange={handleFormChange} fields={['location', 'wateringFrequency', 'wateringAmount', 'wateringMethod', 'sunlight', 'sunlightHours', 'soilType', 'fertilizer', 'humidity', 'temperature', 'pests', 'symptoms', 'potDetails', 'recentChanges', 'plantAge']} />
-              </div>
-            </details>
-          </div>
-
-          <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
-            <button type="submit" disabled={isLoading} className={styles.submitButton}>
-              {isLoading ? 'Debugging...' : 'Debug'}
-            </button>
-            <button
-              type="button"
-              className={styles.submitButton}
-              style={{ background: '#eee', color: '#333', border: '1px solid #ccc' }}
-              onClick={() => {
-                setFiles([]);
-                setFormState({
-                  plantType: '',
-                  location: '',
-                  wateringFrequency: '',
-                  wateringAmount: '',
-                  wateringMethod: '',
-                  sunlight: '',
-                  sunlightHours: '',
-                  soilType: '',
-                  fertilizer: '',
-                  humidity: '',
-                  temperature: '',
-                  pests: '',
-                  symptoms: [],
-                  potDetails: '',
-                  recentChanges: '',
-                  plantAge: '',
-                  description: '',
-                });
-                setDiagnosis(null);
-                setError(null);
-              }}
-              disabled={isLoading}
-            >
-              Reset
-            </button>
-          </div>
-        </form>
-
-        {isLoading && (
-          <div className={styles.loading}>
-            <div className={styles.spinner}></div>
-            <p>Debugging your plant... this may take a moment.</p>
-          </div>
-        )}
-
-        {error && <p className={styles.error}>{error}</p>}
-
-        {diagnosis && <DiagnosisResult diagnosis={diagnosis} />}
+        <div style={{ marginTop: '2rem', width: '100%' }}>
+          {activeTab === 0 && renderUploadTab()}
+          {activeTab === 1 && renderInfoTab()}
+          {activeTab === 2 && renderDiagnosisTab()}
+        </div>
       </main>
 
       <footer className={styles.footer}>
