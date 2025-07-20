@@ -18,11 +18,12 @@ Web app for debugging plant issues.
 - Formidable (API file uploads)
 
 ## Getting Started
+Test at [plant-debug.vercel.app](https://plant-debug.vercel.app/). To run locally:
 
 ### Prerequisites
 - Node.js
 - npm
-- generate a Gemini API key at https://aistudio.google.com/apikey and store in .env.local as GEMINI_API_KEY="xyz"
+- generate a Gemini API key at [aistudio.google.com/apikey](https://aistudio.google.com/apikey)and store in .env.local as GEMINI_API_KEY="xyz"
 
 ### Installation
 ```bash
