@@ -35,7 +35,7 @@
 }
 .container {
   min-height: 20vh;
-  padding: 0 0.5rem;
+  padding: 0.5rem 0.5rem;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -57,7 +57,7 @@
   margin: 0 auto;
   background: #fff;
   border-radius: 18px;
-  box-shadow: 2px 2px 24px rgba(0,0,0,0.12);
+  box-shadow: 2px 2px 24px rgba(0,0,0,0.14);
 }
 
 @media (max-width: 600px) {
