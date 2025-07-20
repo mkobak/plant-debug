@@ -11,39 +11,7 @@ export const config = {
   },
 };
 
-// Downscale image in memory and return buffer
-const downscaleImageBuffer = async (file: File) => {
-  let buffer = await fs.readFile(file.filepath);
-  if ((file.mimetype?.startsWith('image/') || file.mimetype === 'application/octet-stream') && buffer.length > 1024 * 1024) {
-    let quality = 90;
-    let resizedBuffer = buffer;
-    let width;
-    try {
-      let metadata = await sharp(buffer).metadata();
-      width = metadata.width;
-      while (resizedBuffer.length > 1024 * 1024 && quality >= 40 && width && width > 200) {
-        let resizeWidth = Math.max(Math.round(width * 0.85), 200);
-        resizedBuffer = await sharp(resizedBuffer)
-          .resize(resizeWidth)
-          .jpeg({ quality })
-          .toBuffer();
-        quality -= 10;
-        metadata = await sharp(resizedBuffer).metadata();
-        width = metadata.width;
-      }
-      if (resizedBuffer.length > 1024 * 1024) {
-        resizedBuffer = await sharp(resizedBuffer)
-          .resize(800)
-          .jpeg({ quality: 40 })
-          .toBuffer();
-      }
-      buffer = resizedBuffer;
-    } catch (err) {
-      console.warn('Image compression/downscaling failed:', err);
-    }
-  }
-  return buffer;
-};
+// ...existing code...
 
 // Helper to convert buffer to a Gemini-compatible format
 const bufferToGenerativePart = (buffer: Buffer, file: File) => {
@@ -86,8 +54,11 @@ export default async function handler(
       if (!imageFiles || imageFiles.length === 0) {
         return res.status(400).json({ error: 'No images uploaded.' });
       }
-      // Downscale images in memory once, use buffers for all API logic
-      const downscaledBuffers = await Promise.all(imageFiles.map(downscaleImageBuffer));
+      // Log image sizes after upload
+      for (const file of imageFiles) {
+        const buffer = await fs.readFile(file.filepath);
+        console.log(`Uploaded image: ${file.originalFilename || file.filepath}, size: ${buffer.length} bytes (${(buffer.length/1024).toFixed(1)} KB)`);
+      }
 
       const {
         plantType, location, wateringFrequency, wateringAmount, wateringMethod, sunlight, sunlightHours,
@@ -120,7 +91,10 @@ export default async function handler(
         Only reply with the concrete diagnosis names, separated by commas, and nothing else. If no plant appears in the images, respond with 'No plant detected'. If the plant is healthy, respond with 'Plant is healthy'.
         User provided context: \n\n${contextLines.length ? contextLines.join('\n') : 'No further information was provided.'}
         `;
-      const imageParts = imageFiles.map((file, i) => bufferToGenerativePart(downscaledBuffers[i], file));
+      const imageParts = await Promise.all(imageFiles.map(async (file) => {
+        const buffer = await fs.readFile(file.filepath);
+        return bufferToGenerativePart(buffer, file);
+      }));
       const getDiagnosis = async () => {
         console.log("Gemini diagnosis prompt:", diagnosisPrompt);
         const result = await modelFlash.generateContent({

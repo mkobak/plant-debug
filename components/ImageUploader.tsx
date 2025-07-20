@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import styles from '../styles/ImageUploader.module.css';
+import { compressImage } from './imageCompression';
 
 interface ImageUploaderProps {
   files: File[];
@@ -10,9 +11,15 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ files, onFilesChange }) =
   const [isDragging, setIsDragging] = useState(false);
 
   // Handle file selection for a specific slot
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, slot: number) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>, slot: number) => {
     if (e.target.files && e.target.files[0]) {
-      const newFile = e.target.files[0];
+      const originalFile = e.target.files[0];
+      let newFile = originalFile;
+      try {
+        newFile = await compressImage(originalFile, 1, 3000);
+      } catch (err) {
+        console.warn('Image compression failed, using original file.', err);
+      }
       const updatedFiles = [...files];
       updatedFiles[slot] = newFile;
       onFilesChange(updatedFiles.filter(Boolean));
@@ -20,12 +27,18 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ files, onFilesChange }) =
   };
 
   // Drag and drop for a specific slot
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>, slot: number) => {
+  const handleDrop = async (e: React.DragEvent<HTMLDivElement>, slot: number) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(false);
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      const newFile = e.dataTransfer.files[0];
+      const originalFile = e.dataTransfer.files[0];
+      let newFile = originalFile;
+      try {
+        newFile = await compressImage(originalFile, 1, 3000);
+      } catch (err) {
+        console.warn('Image compression failed, using original file.', err);
+      }
       const updatedFiles = [...files];
       updatedFiles[slot] = newFile;
       onFilesChange(updatedFiles.filter(Boolean));
