@@ -11,6 +11,7 @@
 }
 
 .main {
+  box-sizing: border-box;
   padding: 2.5rem 2rem;
   flex: 1;
   display: flex;
@@ -27,12 +28,12 @@
 @media (max-width: 600px) {
   .main {
     max-width: 99vw;
-    padding: 1rem 0.2rem;
+    padding: 1rem 1rem;
     border-radius: 12px;
   }
   .header {
     max-width: 99vw;
-    padding: 1.5rem 0.2rem 0.8rem 0.2rem;
+    padding: 1.5rem 1rem 0.8rem 1rem;
     border-radius: 12px 12px 0 0;
   }
 }
@@ -43,7 +44,7 @@
   margin-top: 0.5rem;
   width: 100%;
   max-width: 700px;
-  padding: 0rem 0rem 1rem 0rem;
+  padding: 0rem 0rem 0.5rem 0rem;
   margin-left: auto;
   margin-right: auto;
 }
