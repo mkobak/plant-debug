@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { formidable, File } from 'formidable';
 import fs from 'fs/promises';
+import sharp from 'sharp';
 
 // Disable Next.js body parsing to allow formidable to handle the stream
 export const config = {
@@ -10,9 +11,34 @@ export const config = {
   },
 };
 
-// Helper to convert file to a Gemini-compatible format
+// Helper to compress/downscale image to <=1MB, preserving as much detail as possible
 const fileToGenerativePart = async (file: File) => {
-  const buffer = await fs.readFile(file.filepath);
+  let buffer = await fs.readFile(file.filepath);
+  // Only process if file is an image and >1MB
+  if ((file.mimetype?.startsWith('image/') || file.mimetype === 'application/octet-stream') && buffer.length > 1024 * 1024) {
+    let quality = 90;
+    let resizedBuffer = buffer;
+    let width;
+    try {
+      const image = sharp(buffer);
+      const metadata = await image.metadata();
+      width = metadata.width;
+      // Iteratively reduce quality and/or resize until <=1MB
+      while (resizedBuffer.length > 1024 * 1024 && quality >= 40) {
+        let resizeWidth = width ? Math.round(width * 0.9) : undefined;
+        resizedBuffer = await sharp(resizedBuffer)
+          .resize(resizeWidth)
+          .jpeg({ quality })
+          .toBuffer();
+        quality -= 10;
+        width = resizeWidth;
+      }
+      buffer = resizedBuffer;
+    } catch (err) {
+      // If sharp fails, fallback to original buffer
+      console.warn('Image compression/downscaling failed:', err);
+    }
+  }
   return {
     inlineData: {
       data: buffer.toString('base64'),
