@@ -96,13 +96,13 @@ const Home: NextPage = () => {
             Plant Debugger
           </h1>
           <p className={styles.description}>
-            Upload pictures of your sad plant and provide some context to start debugging.
+            Upload pictures of your sad plant and provide some additional information to start debugging.
           </p>
         </header>
 
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.formSection}>
-            <h2 className={styles.sectionTitle}>1. Upload Images</h2>
+            <h2 className={styles.sectionTitle}>1. Upload images</h2>
             <div style={{ marginBottom: '0.5rem', color: '#888', fontSize: '0.98em' }}>
               <strong>Tip:</strong> For best results, upload clear, well-lit photos showing the affected parts of your plant. Avoid blurry or dark images.
             </div>
@@ -110,11 +110,9 @@ const Home: NextPage = () => {
           </div>
 
           <div className={styles.formSection}>
-            <h2 className={styles.sectionTitle}>2. Provide Context (optional)</h2>
-            {/* Show only Plant Type and Describe the problem, rest are hidden in expandable section */}
+            <h2 className={styles.sectionTitle}>2. Provide more information (optional)</h2>
             <ContextForm formState={{ ...formState, location: '', wateringFrequency: '', wateringAmount: '', wateringMethod: '', sunlight: '', sunlightHours: '', soilType: '', fertilizer: '', humidity: '', temperature: '', pests: '', symptoms: [], potDetails: '', recentChanges: '', plantAge: '' }} onFormChange={handleFormChange} fields={['plantType', 'description']} />
-            <details style={{ marginTop: '1rem' }} open={detailsOpen} onToggle={e => setDetailsOpen(e.currentTarget.open)}>
-              {/* Only one big chevron, rotates on expand */}
+            <details style={{ marginTop: '0.5rem' }} open={detailsOpen} onToggle={e => setDetailsOpen(e.currentTarget.open)}>
               <summary
                 style={{
                   cursor: 'pointer',
@@ -133,15 +131,15 @@ const Home: NextPage = () => {
                 onMouseOver={e => (e.currentTarget.style.background = '#ececf6')}
                 onMouseOut={e => (e.currentTarget.style.background = '#f7f7fa')}
               >
-              Provide more context
+              Provide even more information
               </summary>
-              <div style={{ marginTop: '1em', display: 'flex', flexDirection: 'column', gap: '1.2em' }}>
+              <div style={{ marginTop: '1em', display: 'flex', flexDirection: 'column', gap: '1em' }}>
                 <ContextForm formState={formState} onFormChange={handleFormChange} fields={['location', 'wateringFrequency', 'wateringAmount', 'wateringMethod', 'sunlight', 'sunlightHours', 'soilType', 'fertilizer', 'humidity', 'temperature', 'pests', 'symptoms', 'potDetails', 'recentChanges', 'plantAge']} />
               </div>
             </details>
           </div>
 
-          <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+          <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
             <button type="submit" disabled={isLoading} className={styles.submitButton}>
               {isLoading ? 'Debugging...' : 'Debug'}
             </button>
@@ -183,7 +181,7 @@ const Home: NextPage = () => {
         {isLoading && (
           <div className={styles.loading}>
             <div className={styles.spinner}></div>
-            <p>Analyzing your plant... this may take a moment.</p>
+            <p>Debugging your plant... this may take a moment.</p>
           </div>
         )}
 
