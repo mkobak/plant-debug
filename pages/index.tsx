@@ -92,8 +92,8 @@ const Home: NextPage = () => {
 
       <main className={styles.main}>
         <header className={styles.header}>
+          <img src="/logo.png" alt="Plant Debug Logo" style={{ height: '64px', width: '64px', objectFit: 'contain', marginBottom: '0.5rem' }} />
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem' }}>
-            <img src="/logo.png" alt="Plant Debug Logo" style={{ height: '55px', width: '55px', objectFit: 'contain', marginRight: '0.5rem' }} />
             <h1 className={styles.title} style={{ margin: 0 }}>
               Plant Debugger
             </h1>
