@@ -86,9 +86,9 @@ const Home: NextPage = () => {
 
   // Tab bar
   const tabNames = [
-    '1. Upload images',
-    '2. Provide details',
-    '3. Diagnosis results',
+    '1. Upload \n images',
+    '2. Provide \n details',
+    '3. Diagnosis \n results',
   ];
 
   // Reset handler
@@ -128,7 +128,7 @@ const Home: NextPage = () => {
         </div>
         <ImageUploader files={files} onFilesChange={setFiles} />
       </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '2rem', marginBottom: '1rem', width: '100%' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem', marginBottom: '1rem', width: '100%' }}>
 
         <button
           type="button"
@@ -183,7 +183,7 @@ const Home: NextPage = () => {
           </div>
         </details>
       </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '2rem', marginBottom: '1rem', width: '100%' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem', marginBottom: '1rem', width: '100%' }}>
         <button
           type="button"
           className={styles.submitButton}
