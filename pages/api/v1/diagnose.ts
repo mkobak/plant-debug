@@ -29,10 +29,19 @@ export default async function handler(
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+  if (!process.env.GEMINI_API_KEY) {
+    return res.status(500).json({ error: 'Gemini API key is missing.' });
+  }
+
+  let genAI;
+  try {
+    genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+  } catch (err) {
+    return res.status(500).json({ error: 'Failed to initialize Gemini API. Check your API key.' });
+  }
+  
   const modelPro = genAI.getGenerativeModel({ model: 'gemini-2.5-pro' });
   const modelFlash = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
-
 
   try {
     const form = formidable({});
