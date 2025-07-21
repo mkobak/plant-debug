@@ -124,7 +124,7 @@ const Home: NextPage = () => {
       <div className={styles.formSection}>
         <h2 className={styles.sectionTitle}>1. Upload images</h2>
         <div style={{ marginBottom: '0.5rem', color: '#888', fontSize: '0.98em' }}>
-          <strong>Tip:</strong> For best results, upload clear, well-lit photos showing the affected parts of your plant. Avoid blurry or dark images.
+          <strong>Tip:</strong> For best results, upload clear, well-lit photos showing the affected parts of your plant.
         </div>
         <ImageUploader files={files} onFilesChange={setFiles} />
       </div>
