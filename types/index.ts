@@ -31,3 +31,7 @@ export interface DiagnosisResponse {
   secondaryTreatmentPlan?: string;
   secondaryPreventionTips?: string;
 }
+
+export interface IntermediateDiagnosisResponse {
+  rankedDiagnoses: string[];
+}

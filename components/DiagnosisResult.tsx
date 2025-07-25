@@ -24,10 +24,10 @@ export const DiagnosisResult: React.FC<DiagnosisResultProps> = ({ diagnosis }) =
   return (
     <div className={styles.resultContainer}>
       <div className={styles.header}>
-        <h2 style={{ marginBottom: 0 }}>Plant Identified: {diagnosis.plant}</h2>
+        <h3 className={styles.headerTitle}>Plant Identified: {diagnosis.plant}</h3>
       </div>
-      <div className={styles.header}>
-        <h2 style={{ marginBottom: 0 }}>Primary Diagnosis: {diagnosis.primaryDiagnosis}</h2>
+      <div className={`${styles.header} ${styles.primaryDiagnosisHeader}`}>
+        <h3 className={styles.headerTitle}>Primary Diagnosis: {diagnosis.primaryDiagnosis}</h3>
       </div>
       <div className={styles.header}>
         <span
@@ -54,9 +54,9 @@ export const DiagnosisResult: React.FC<DiagnosisResultProps> = ({ diagnosis }) =
       </div>
 
       {diagnosis.secondaryDiagnosis && diagnosis.secondaryDiagnosis.trim() && (
-        <div className={styles.section} style={{ marginTop: 32, borderTop: '2px solid #eee', paddingTop: 24 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 8 }}>
-            <h2 style={{ color: '#888', marginBottom: 15, marginRight: 0 }}>Secondary Diagnosis: {diagnosis.secondaryDiagnosis}</h2>
+        <div className={`${styles.section} ${styles.secondaryDiagnosisSection}`}>
+          <div className={styles.header}>
+            <h3 className={styles.secondaryHeaderTitle}>Secondary Diagnosis: {diagnosis.secondaryDiagnosis}</h3>
           </div>
           <div className={styles.header}>
             {diagnosis.secondaryConfidence && (
@@ -69,19 +69,19 @@ export const DiagnosisResult: React.FC<DiagnosisResultProps> = ({ diagnosis }) =
             )}
           </div>
           {diagnosis.secondaryReasoning && (
-            <div style={{ marginTop: 12 }}>
+            <div className={styles.subsection}>
               <h3>Reasoning</h3>
               <ReactMarkdown>{diagnosis.secondaryReasoning}</ReactMarkdown>
             </div>
           )}
           {diagnosis.secondaryTreatmentPlan && (
-            <div style={{ marginTop: 12 }}>
+            <div className={styles.subsection}>
               <h3>Treatment Plan</h3>
               <ReactMarkdown>{diagnosis.secondaryTreatmentPlan}</ReactMarkdown>
             </div>
           )}
           {diagnosis.secondaryPreventionTips && (
-            <div style={{ marginTop: 12 }}>
+            <div className={styles.subsection}>
               <h3>Prevention Tips</h3>
               <ReactMarkdown>{diagnosis.secondaryPreventionTips}</ReactMarkdown>
             </div>

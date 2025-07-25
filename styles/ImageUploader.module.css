@@ -6,22 +6,74 @@
 }
 
 .dropzone {
-  border: 2px dashed #ccc;
-  border-radius: 8px;
+  border: 2px dashed var(--grey-400);
+  border-radius: 12px;
   padding: 2rem;
   text-align: center;
   cursor: pointer;
-  transition: border-color 0.2s, background-color 0.2s;
-  color: #555;
+  transition: all 0.2s ease;
+  color: var(--grey-600);
+  background: var(--grey-50);
+  min-height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .dropzone:hover {
-  border-color: #0070f3;
+  border-color: #76a15c;
+  background: var(--grey-100);
 }
 
 .dropzone.dragging {
-  border-color: #0070f3;
-  background-color: #f0f8ff;
+  border-color: #76a15c;
+  background-color: #e6f3ff;
+  transform: scale(1.02);
+}
+
+.dropzone.compact {
+  padding: 1rem;
+  min-height: 45px;
+  background: var(--grey-100);
+}
+
+.uploadPrompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.uploadIcon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.uploadText {
+  text-align: center;
+}
+
+.uploadSubtext {
+  font-size: 0.875rem;
+  color: var(--grey-500);
+  margin-top: 0.25rem;
+}
+
+.compactPrompt {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+}
+
+.addMoreText {
+  color: #308300;
+  font-weight: 500;
+}
+
+.maxReachedText {
+  color: var(--grey-500);
+  cursor: not-allowed;
 }
 
 .fileInput {
@@ -32,70 +84,85 @@
   display: flex;
   flex-direction: row;
   gap: 1rem;
-  margin-top: 1rem;
+  margin-top: 0.5rem;
   width: 100%;
-  justify-content: space-between;
-  flex-wrap: nowrap;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 @media (max-width: 600px) {
   .previewContainer {
     gap: 0.5rem;
-    margin-top: 0.5rem;
-    flex-wrap: wrap;
     justify-content: center;
   }
 }
 
 .previewItem {
   position: relative;
-  flex: 1 1 0;
-  aspect-ratio: 1 / 1;
-  min-width: 0;
-  max-width: none;
-  height: auto;
+  width: 120px;
+  height: 120px;
   border-radius: 12px;
-  background: #fafbfc;
+  background: var(--grey-50);
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  transition: border 0.2s;
+  transition: transform 0.2s ease;
+  border: 2px solid var(--grey-300);
+}
+
+.previewItem:hover {
+  transform: scale(1.05);
 }
 
 @media (max-width: 600px) {
   .previewItem {
-    min-width: 80px;
-    max-width: 120px;
-    aspect-ratio: 1 / 1;
-    height: auto;
+    width: 100px;
+    height: 100px;
   }
 }
 
 .previewImage {
   width: 100%;
   height: 100%;
-  aspect-ratio: 1 / 1;
   object-fit: cover;
-  border-radius: 12px;
+  border-radius: 10px;
 }
 
 .removeButton {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  background: #dc3545;
+  top: 6px;
+  right: 6px;
+  background: var(--red-primary);
   color: white;
   border: none;
   border-radius: 50%;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22px;
+  font-size: 18px;
   line-height: 1;
-  box-shadow: 0 1px 6px rgba(0,0,0,0.18);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
   z-index: 10;
+  transition: all 0.2s ease;
+  opacity: 0.9;
+}
+
+.removeButton:hover {
+  background: var(--red-dark);
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+@media (max-width: 600px) {
+  .removeButton {
+    width: 24px;
+    height: 24px;
+    font-size: 16px;
+    top: 4px;
+    right: 4px;
+  }
 }

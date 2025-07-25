@@ -1,0 +1,59 @@
+.container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0rem;
+}
+
+.formSection {
+  margin-bottom: 0rem;
+}
+
+.sectionTitle {
+  font-size: 1.1rem;
+  color: var(--grey-800);
+  margin: 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--grey-300);
+}
+
+.content {
+  flex: 1;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 1rem;
+  width: 100%;
+}
+
+.intermediateResults {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: var(--grey-50);
+  border-radius: 8px;
+  border-left: 4px solid var(--green-primary);
+}
+
+.diagnosisList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.diagnosisItem {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--grey-300);
+  font-weight: 500;
+  color: var(--grey-700);
+}
+
+.diagnosisItem:last-child {
+  border-bottom: none;
+}
+
+.diagnosisItem:first-child {
+  color: var(--green-primary);
+  font-weight: 600;
+}

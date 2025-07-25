@@ -1,282 +1,165 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { NextPage } from 'next';
-import Head from 'next/head';
 import styles from '../styles/Home.module.css';
-import { DiagnosisFormState, DiagnosisResponse } from '../types';
-import ImageUploader from '../components/ImageUploader';
-import ContextForm from '../components/ContextForm';
-import { DiagnosisResult } from '../components/DiagnosisResult';
+import { usePlantForm } from '../hooks/usePlantForm';
+import { useTabNavigation } from '../hooks/useTabNavigation';
+import { TabBar } from '../components/common';
+import { UploadTab, InfoTab, ResultsTab } from '../components/tabs';
 
 const Home: NextPage = () => {
-  const [activeTab, setActiveTab] = useState<0 | 1 | 2>(0);
-  const [detailsOpen, setDetailsOpen] = useState(false);
-  const [files, setFiles] = useState<File[]>([]);
-  const [formState, setFormState] = useState<DiagnosisFormState>({
-    plantType: '',
-    location: '',
-    wateringFrequency: '',
-    wateringAmount: '',
-    wateringMethod: '',
-    sunlight: '',
-    sunlightHours: '',
-    soilType: '',
-    fertilizer: '',
-    humidity: '',
-    temperature: '',
-    pests: '',
-    symptoms: [],
-    potDetails: '',
-    recentChanges: '',
-    plantAge: '',
-    description: '',
-  });
-  const [diagnosis, setDiagnosis] = useState<DiagnosisResponse | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    formState,
+    files,
+    setFiles,
+    diagnosis,
+    intermediateDiagnosis,
+    isLoading,
+    error,
+    plantNameLoading,
+    handleFormChange,
+    resetForm,
+    identifyPlantName,
+    submitDiagnosis,
+  } = usePlantForm();
 
-  const handleFormChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormState((prevState) => ({ ...prevState, [name]: value }));
+  const { 
+    activeTab, 
+    canNavigateToTabViaButton, 
+    navigateForward, 
+    navigateViaButton, 
+    resetNavigation 
+  } = useTabNavigation();
+  
+  const [headerCompact, setHeaderCompact] = useState(false);
+  const [compactActivated, setCompactActivated] = useState(false); // Track if compact has been activated
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Hook to detect mobile screen size
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 600);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  const handleNextWithPlantName = async () => {
+    // On mobile, activate compact header on first navigation
+    if (isMobile && !compactActivated) {
+      setHeaderCompact(true);
+      setCompactActivated(true);
+    }
+    navigateForward(1, files.length, !!diagnosis);
+    await identifyPlantName();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (files.length === 0) {
-      setError('Please upload at least one image of your plant.');
-      return;
-    }
-    setIsLoading(true);
-    setError(null);
-    setDiagnosis(null);
-    setActiveTab(2); // Jump to results tab immediately
-
-    const formData = new FormData();
-    files.forEach((file) => {
-      formData.append('images', file);
-    });
-    Object.entries(formState).forEach(([key, value]) => {
-      if (Array.isArray(value)) {
-        value.forEach((v) => formData.append(key, v));
-      } else {
-        formData.append(key, value);
-      }
-    });
-
-    try {
-      const response = await fetch('/api/v1/diagnose', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'An unknown error occurred.');
-      }
-
-      const result = await response.json();
-      setDiagnosis(result);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setIsLoading(false);
-    }
+    navigateForward(2, files.length, true); // Allow navigation to results tab when submitting
+    await submitDiagnosis();
   };
 
-  // Tab bar
-  const tabNames = [
-    '1. Upload \n images',
-    '2. Provide \n details',
-    '3. Diagnosis \n results',
-  ];
-
-  // Reset handler
   const handleReset = () => {
-    setFiles([]);
-    setFormState({
-      plantType: '',
-      location: '',
-      wateringFrequency: '',
-      wateringAmount: '',
-      wateringMethod: '',
-      sunlight: '',
-      sunlightHours: '',
-      soilType: '',
-      fertilizer: '',
-      humidity: '',
-      temperature: '',
-      pests: '',
-      symptoms: [],
-      potDetails: '',
-      recentChanges: '',
-      plantAge: '',
-      description: '',
-    });
-    setDiagnosis(null);
-    setError(null);
-    setActiveTab(0);
+    resetForm();
+    resetNavigation();
+    setHeaderCompact(false); // Back to full header
+    setCompactActivated(false); // Reset compact activation state
   };
 
-  // Tab content renderers
-  const renderUploadTab = () => (
-    <form className={styles.form} onSubmit={e => e.preventDefault()}>
-      <div className={styles.formSection}>
-        <h2 className={styles.sectionTitle}>1. Upload images</h2>
-        <div style={{ marginBottom: '0.5rem', color: '#888', fontSize: '0.98em' }}>
-          <strong>Tip:</strong> For best results, upload clear, well-lit photos showing the affected parts of your plant.
-        </div>
-        <ImageUploader files={files} onFilesChange={setFiles} />
-      </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem', marginBottom: '1rem', width: '100%' }}>
+  const handleTabChange = (tab: typeof activeTab) => {
+    // Only allow navigation to previously reached tabs (backward navigation)
+    navigateViaButton(tab);
+    
+    // Header behavior logic:
+    // - On desktop: always keep header big
+    // - On mobile: once compact is activated, keep it compact until reset
+    if (isMobile) {
+      if (tab > 0 && !compactActivated) {
+        // First time navigating to tab 1+ on mobile
+        setHeaderCompact(true);
+        setCompactActivated(true);
+      } else if (compactActivated) {
+        // Keep compact if it was already activated
+        setHeaderCompact(true);
+      } else {
+        // Tab 0 and compact not yet activated
+        setHeaderCompact(false);
+      }
+    } else {
+      // Desktop: always keep header big
+      setHeaderCompact(false);
+    }
+  };
 
-        <button
-          type="button"
-          className={styles.submitButton}
-          style={{ background: '#eee', color: '#333', border: '1px solid #ccc' }}
-          onClick={handleReset}
-        >
-          Reset
-        </button>
-        <button
-          type="button"
-          className={styles.submitButton}
-          disabled={files.length === 0}
-          onClick={() => setActiveTab(1)}
-        >
-          Next
-        </button>
-      </div>
-    </form>
-  );
-
-  const renderInfoTab = () => (
-    <form onSubmit={handleSubmit} className={styles.form} style={{ width: '100%' }}>
-      <div className={styles.formSection} style={{ width: '100%' }}>
-        <h2 className={styles.sectionTitle}>2. Provide details (optional)</h2>
-        <ContextForm formState={{ ...formState, location: '', wateringFrequency: '', wateringAmount: '', wateringMethod: '', sunlight: '', sunlightHours: '', soilType: '', fertilizer: '', humidity: '', temperature: '', pests: '', symptoms: [], potDetails: '', recentChanges: '', plantAge: '' }} onFormChange={handleFormChange} fields={['plantType', 'description']} />
-        <details style={{ marginTop: '0.5rem', width: '100%' }} open={detailsOpen} onToggle={e => setDetailsOpen(e.currentTarget.open)}>
-          <summary
-            style={{
-              cursor: 'pointer',
-              fontWeight: 600,
-              fontSize: '1.15em',
-              color: '#444',
-              padding: '0.7em 0.7em 0.7em 0.9em',
-              background: '#f7f7fa',
-              borderRadius: '6px',
-              boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
-              border: '1px solid #e0e0e0',
-              position: 'relative',
-              transition: 'background 0.2s',
-              userSelect: 'none',
-              width: '100%',
-              boxSizing: 'border-box',
-            }}
-            onMouseOver={e => (e.currentTarget.style.background = '#ececf6')}
-            onMouseOut={e => (e.currentTarget.style.background = '#f7f7fa')}
-          >
-            Provide more information
-          </summary>
-          <div style={{ marginTop: '1em', display: 'flex', flexDirection: 'column', gap: '1em', width: '100%' }}>
-            <ContextForm formState={formState} onFormChange={handleFormChange} fields={['location', 'wateringFrequency', 'wateringAmount', 'wateringMethod', 'sunlight', 'sunlightHours', 'soilType', 'fertilizer', 'humidity', 'temperature', 'pests', 'symptoms', 'potDetails', 'recentChanges', 'plantAge']} />
-          </div>
-        </details>
-      </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem', marginBottom: '1rem', width: '100%' }}>
-        <button
-          type="button"
-          className={styles.submitButton}
-          style={{ background: '#eee', color: '#333', border: '1px solid #ccc' }}
-          onClick={handleReset}
-        >
-          Reset
-        </button>
-        <button
-          type="submit"
-          className={styles.submitButton}
-          disabled={isLoading}
-        >
-          {isLoading ? 'Debugging...' : 'Debug'}
-        </button>
-      </div>
-    </form>
-  );
-
-  const renderDiagnosisTab = () => (
-    <>
-      <div>
-        {isLoading && (
-          <div className={styles.loading}>
-            <div className={styles.spinner}></div>
-            <p>Debugging your plant... this may take a moment.</p>
-          </div>
-        )}
-        {error && <p className={styles.error}>{error}</p>}
-        {diagnosis && <DiagnosisResult diagnosis={diagnosis} />}
-      </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '2rem', marginBottom: '1rem', width: '100%' }}>
-        <button
-          type="button"
-          className={styles.submitButton}
-          style={{ background: '#eee', color: '#333', border: '1px solid #ccc' }}
-          onClick={handleReset}
-        >
-          Reset
-        </button>
-      </div>
-    </>
-  );
-
-  // Tab bar component
-  const renderTabBar = () => (
-    <nav className={styles.tabBar}>
-      {tabNames.map((name, idx) => {
-        const enabled =
-          (idx === 0) ||
-          (idx === 1 && files.length > 0) ||
-          (idx === 2 && diagnosis);
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 0:
         return (
-          <button
-            key={name}
-            className={styles.tabButton + (activeTab === idx ? ' ' + styles.activeTab : '')}
-            disabled={!enabled}
-            onClick={() => enabled && setActiveTab(idx as 0 | 1 | 2)}
-          >
-            {name}
-          </button>
+          <UploadTab
+            files={files}
+            onFilesChange={setFiles}
+            onNext={handleNextWithPlantName}
+            onReset={handleReset}
+            plantNameLoading={plantNameLoading}
+          />
         );
-      })}
-    </nav>
-  );
+      case 1:
+        return (
+          <InfoTab
+            formState={formState}
+            onFormChange={handleFormChange}
+            onSubmit={handleSubmit}
+            onReset={handleReset}
+            isLoading={isLoading}
+            plantNameLoading={plantNameLoading}
+          />
+        );
+      case 2:
+        return (
+          <ResultsTab
+            diagnosis={diagnosis}
+            intermediateDiagnosis={intermediateDiagnosis}
+            isLoading={isLoading}
+            error={error}
+            onReset={handleReset}
+          />
+        );
+      default:
+        return null;
+    }
+  };
 
   return (
     <div className={styles.container}>
-      <Head>
-        <title>Plant Debugger</title>
-        <meta name="description" content="Debug your plants" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
       <main className={styles.main}>
-        <header className={styles.header}>
-          <img src="/logo.png" alt="Plant Debug Logo" style={{ height: '64px', width: '64px', objectFit: 'contain', marginBottom: '0.5rem' }} />
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem' }}>
-            <h1 className={styles.title} style={{ margin: 0 }}>
-              Plant Debugger
-            </h1>
+        <header className={`${styles.header} ${headerCompact ? styles.headerCompact : ''}`}>
+          <div className={styles.logoTitleContainer}>
+            <img 
+              src="/logo.png" 
+              alt="Plant Debug Logo" 
+              className={styles.logo}
+            />
+            <div className={styles.titleContainer}>
+              <h1 className={styles.title}>
+                Plant Debugger
+              </h1>
+            </div>
           </div>
           <p className={styles.description}>
-              Upload pictures of your sad plant and provide some context to start debugging.
-            </p>
+            Upload pictures of your sad plant and provide some context to start debugging.
+          </p>
         </header>
 
-        {renderTabBar()}
+        <TabBar
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+          canNavigateToTab={canNavigateToTabViaButton}
+        />
 
-        <div style={{ marginTop: '2rem', width: '100%' }}>
-          {activeTab === 0 && renderUploadTab()}
-          {activeTab === 1 && renderInfoTab()}
-          {activeTab === 2 && renderDiagnosisTab()}
+        <div className={`${styles.tabContent} ${headerCompact ? styles.tabContentCompact : ''}`}>
+          {renderTabContent()}
         </div>
       </main>
 

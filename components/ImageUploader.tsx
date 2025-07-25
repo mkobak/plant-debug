@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import styles from '../styles/ImageUploader.module.css';
-import { compressImage } from './imageCompression';
+import { compressImage } from '../utils/imageCompression';
 
 interface ImageUploaderProps {
   files: File[];
@@ -9,39 +9,45 @@ interface ImageUploaderProps {
 
 const ImageUploader: React.FC<ImageUploaderProps> = ({ files, onFilesChange }) => {
   const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Handle file selection for a specific slot
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>, slot: number) => {
-    if (e.target.files && e.target.files[0]) {
-      const originalFile = e.target.files[0];
-      let newFile = originalFile;
+  const MAX_FILES = 3;
+
+  const processFiles = async (newFiles: FileList | File[]) => {
+    const fileArray = Array.from(newFiles);
+    const remainingSlots = MAX_FILES - files.length;
+    const filesToProcess = fileArray.slice(0, remainingSlots);
+
+    const compressedFiles: File[] = [];
+    for (const file of filesToProcess) {
       try {
-        newFile = await compressImage(originalFile, 1, 3000);
+        const compressedFile = await compressImage(file, 1, 3000);
+        compressedFiles.push(compressedFile);
       } catch (err) {
         console.warn('Image compression failed, using original file.', err);
+        compressedFiles.push(file);
       }
-      const updatedFiles = [...files];
-      updatedFiles[slot] = newFile;
-      onFilesChange(updatedFiles.filter(Boolean));
+    }
+
+    const updatedFiles = [...files, ...compressedFiles];
+    onFilesChange(updatedFiles);
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      await processFiles(e.target.files);
+      // Reset the input to allow selecting the same files again
+      e.target.value = '';
     }
   };
 
-  // Drag and drop for a specific slot
-  const handleDrop = async (e: React.DragEvent<HTMLDivElement>, slot: number) => {
+  const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(false);
+    
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      const originalFile = e.dataTransfer.files[0];
-      let newFile = originalFile;
-      try {
-        newFile = await compressImage(originalFile, 1, 3000);
-      } catch (err) {
-        console.warn('Image compression failed, using original file.', err);
-      }
-      const updatedFiles = [...files];
-      updatedFiles[slot] = newFile;
-      onFilesChange(updatedFiles.filter(Boolean));
+      await processFiles(e.dataTransfer.files);
       e.dataTransfer.clearData();
     }
   };
@@ -55,55 +61,101 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ files, onFilesChange }) =
   const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
+    // Only set isDragging to false if we're actually leaving the dropzone
+    if (e.currentTarget.contains(e.relatedTarget as Node)) {
+      return;
+    }
     setIsDragging(false);
   };
 
-  const removeFile = (slot: number) => {
-    const updatedFiles = [...files];
-    updatedFiles[slot] = undefined as any;
-    onFilesChange(updatedFiles.filter(Boolean));
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
   };
 
-  // Render 3 slots
+  const removeFile = (index: number) => {
+    const updatedFiles = files.filter((_, i) => i !== index);
+    onFilesChange(updatedFiles);
+  };
+
+  const openFileSelector = () => {
+    fileInputRef.current?.click();
+  };
+
+  const hasFiles = files.length > 0;
+  const canAddMore = files.length < MAX_FILES;
+
   return (
     <div className={styles.uploaderContainer}>
-      <div className={styles.previewContainer} style={{ justifyContent: 'flex-start' }}>
-        {[0, 1, 2].map((slot) => (
-          <div
-            key={slot}
-            className={styles.previewItem}
-            style={{ border: files[slot] ? 'none' : '2px dashed #ccc', background: files[slot] ? 'none' : '#fafbfc', position: 'relative', cursor: 'pointer' }}
-            onClick={() => document.getElementById(`fileInput${slot}`)?.click()}
-            onDragEnter={handleDragEnter}
-            onDragLeave={handleDragLeave}
-            onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
-            onDrop={(e) => handleDrop(e, slot)}
-          >
-            {files[slot] ? (
+      {/* Main upload area */}
+      <div
+        className={`${styles.dropzone} ${isDragging ? styles.dragging : ''} ${hasFiles ? styles.compact : ''}`}
+        onDragEnter={handleDragEnter}
+        onDragLeave={handleDragLeave}
+        onDragOver={handleDragOver}
+        onDrop={handleDrop}
+        onClick={canAddMore ? openFileSelector : undefined}
+      >
+        <input
+          ref={fileInputRef}
+          type="file"
+          onChange={handleFileChange}
+          accept="image/*"
+          capture="environment"
+          multiple
+          className={styles.fileInput}
+          disabled={!canAddMore}
+        />
+        
+        {!hasFiles ? (
+          <div className={styles.uploadPrompt}>
+            <div className={styles.uploadText}>
+              <strong>Drop images here or click to select</strong>
+              <div className={styles.uploadSubtext}>
+                You can upload up to {MAX_FILES} images
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className={styles.compactPrompt}>
+            {canAddMore && (
               <>
-                <img src={URL.createObjectURL(files[slot])} alt={`preview ${slot}`} className={styles.previewImage} />
-                <button type="button" onClick={(e) => { e.stopPropagation(); removeFile(slot); }} className={styles.removeButton}>&times;</button>
-              </>
-            ) : (
-              <>
-                <input
-                  type="file"
-                  id={`fileInput${slot}`}
-                  onChange={(e) => handleFileChange(e, slot)}
-                  accept="image/png, image/jpeg, image/webp, image/heic"
-                  className={styles.fileInput}
-                />
-                <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#bbb', fontSize: 24 }}>
-                  +
-                </div>
+                <span className={styles.addMoreText}>
+                  Drop more images or click to add ({files.length}/{MAX_FILES})
+                </span>
               </>
             )}
+            {!canAddMore && (
+              <span className={styles.maxReachedText}>
+                Maximum {MAX_FILES} images uploaded
+              </span>
+            )}
           </div>
-        ))}
+        )}
       </div>
-      <div style={{ color: '#888', fontSize: '0.98em', marginTop: 8, textAlign: 'left' }}>
-        Drag & drop or click a slot to select an image. You can upload up to 3 images.
-      </div>
+
+      {/* Image previews */}
+      {hasFiles && (
+        <div className={styles.previewContainer}>
+          {files.map((file, index) => (
+            <div key={index} className={styles.previewItem}>
+              <img 
+                src={URL.createObjectURL(file)} 
+                alt={`Preview ${index + 1}`} 
+                className={styles.previewImage} 
+              />
+              <button 
+                type="button" 
+                onClick={(e) => { e.stopPropagation(); removeFile(index); }} 
+                className={styles.removeButton}
+                aria-label={`Remove image ${index + 1}`}
+              >
+                ×
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

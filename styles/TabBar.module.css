@@ -1,0 +1,43 @@
+.tabBar {
+  display: flex;
+  width: 100%;
+  max-width: 700px;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  white-space: pre-line;
+}
+
+.tabButton {
+  flex: 1 1 0;
+  padding: 0.6rem 0;
+  font-size: 0.9em;
+  font-weight: 500;
+  background: var(--grey-100);
+  border: none;
+  border-bottom: 2px solid var(--grey-300);
+  color: var(--grey-700);
+  cursor: pointer;
+  transition: background 0.18s, border-bottom 0.18s;
+  outline: none;
+}
+
+.tabButton:disabled {
+  color: var(--grey-hover-400);
+  background: var(--grey-100);
+  cursor: not-allowed;
+}
+
+.activeTab {
+  background: #ededf1;
+  border-bottom: 2px solid var(--green-primary);
+  color: var(--green-primary);
+  font-weight: 600;
+}
+
+@media (max-width: 600px) {
+  .tabButton {
+    font-size: 0.8em;
+    padding: 0.5rem 0;
+  }
+}

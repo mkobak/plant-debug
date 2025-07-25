@@ -1,309 +1,335 @@
 
-import React from 'react';
+
+import React, { useState } from 'react';
 import { DiagnosisFormState } from '../types';
 import styles from '../styles/ContextForm.module.css';
+import { WATERING_FREQUENCY_LABELS, WATERING_AMOUNT_LABELS, SUNLIGHT_LABELS } from '../constants/sliderLabels';
 
 interface ContextFormProps {
   formState: DiagnosisFormState;
   onFormChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void;
-  fields?: string[];
+  plantNameLoading?: boolean;
+  plantNameDisabled?: boolean;
 }
 
-const ContextForm: React.FC<ContextFormProps> = ({ formState, onFormChange, fields }) => {
-  // If fields is provided, only render those fields. Otherwise, render all.
-  const show = (field: string) => !fields || fields.includes(field);
+// Main fields always shown
+const MAIN_FIELDS = ['plantType', 'description', 'pests', 'watering', 'sunlight'];
+
+const ContextForm: React.FC<ContextFormProps> = ({ formState, onFormChange, plantNameLoading, plantNameDisabled }) => {
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  
+  // Helper function to handle slider changes
+  const handleSliderChange = (fieldName: string, value: string) => {
+    onFormChange({
+      target: { name: fieldName, value: value }
+    } as React.ChangeEvent<HTMLInputElement>);
+  };
+
+  // Helper function to reset a slider
+  const resetSlider = (fieldName: string) => {
+    onFormChange({
+      target: { name: fieldName, value: '' }
+    } as React.ChangeEvent<HTMLInputElement>);
+  };
+
+  // Helper function to reset a radio button
+  const resetRadio = (fieldName: string) => {
+    onFormChange({
+      target: { name: fieldName, value: '' }
+    } as React.ChangeEvent<HTMLInputElement>);
+  };
+
+  // Helper function to get slider display value
+  const getSliderDisplayValue = (fieldName: string, valueMap: string[]) => {
+    const value = formState[fieldName as keyof DiagnosisFormState] as string;
+    if (!value) return '';
+    const idx = parseInt(value) - 1;
+    return valueMap[idx] || '';
+  };
   return (
     <>
-      {show('plantType') && (
-        <>
-          <label htmlFor="plantType" style={{ fontWeight: 'bold' }}>
-            Plant name
-          </label>
-          <input
-            type="text"
-            id="plantType"
-            name="plantType"
-            placeholder="e.g., Monstera"
-            value={formState.plantType}
-            onChange={onFormChange}
-            className={styles.input}
-            aria-label="Plant Type"
-          />
-        </>
-      )}
-      {show('description') && (
-        <>
-          <label htmlFor="description" style={{ fontWeight: 'bold', marginTop: 12 }}>
-            Describe the problem
-          </label>
-          <textarea
-            id="description"
-            name="description"
-            placeholder="e.g., Leaves are turning yellow and have brown spots."
-            value={formState.description}
-            onChange={onFormChange}
-            className={styles.input}
-            aria-label="Description"
-            rows={3}
-            style={{ resize: 'vertical', marginBottom: 12 }}
-          />
-        </>
-      )}
-      {show('location') && (
-        <>
-          <label htmlFor="location" style={{ fontWeight: 'bold', marginTop: 12 }}>Location</label>
-          <select
-            id="location"
-            name="location"
-            value={formState.location}
-            onChange={onFormChange}
-            className={styles.select}
-            aria-label="Location"
-          >
-            <option value="">Select Location</option>
-            <option value="indoor">Indoor</option>
-            <option value="outdoor">Outdoor</option>
-            <option value="greenhouse">Greenhouse</option>
-            <option value="windowsill">Windowsill</option>
-            <option value="balcony">Balcony</option>
-          </select>
-        </>
-      )}
-      {show('wateringFrequency') || show('wateringAmount') || show('wateringMethod') ? (
-        <>
-          <label style={{ fontWeight: 'bold', marginTop: 12 }}>Watering</label>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
-            {show('wateringFrequency') && (
-              <select
-                id="wateringFrequency"
-                name="wateringFrequency"
-                value={formState.wateringFrequency}
-                onChange={onFormChange}
-                className={styles.select}
-                aria-label="Watering Frequency"
-              >
-                <option value="">Frequency</option>
-                <option value="daily">Daily</option>
-                <option value="every_2_3_days">Every 2-3 days</option>
-                <option value="weekly">Weekly</option>
-                <option value="biweekly">Every 2 weeks</option>
-                <option value="monthly">Monthly</option>
-              </select>
-            )}
-            {show('wateringAmount') && (
-              <select
-                id="wateringAmount"
-                name="wateringAmount"
-                value={formState.wateringAmount}
-                onChange={onFormChange}
-                className={styles.select}
-                aria-label="Watering Amount"
-              >
-                <option value="">Amount</option>
-                <option value="light">Light</option>
-                <option value="moderate">Moderate</option>
-                <option value="heavy">Heavy</option>
-              </select>
-            )}
-            {show('wateringMethod') && (
-              <select
-                id="wateringMethod"
-                name="wateringMethod"
-                value={formState.wateringMethod}
-                onChange={onFormChange}
-                className={styles.select}
-                aria-label="Watering Method"
-              >
-                <option value="">Method</option>
-                <option value="top">Top watering</option>
-                <option value="bottom">Bottom watering</option>
-                <option value="misting">Misting</option>
-              </select>
-            )}
-          </div>
-        </>
-      ) : null}
-      {show('sunlight') || show('sunlightHours') ? (
-        <>
-          <label style={{ fontWeight: 'bold', marginTop: 12 }}>Sunlight</label>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
-            {show('sunlight') && (
-              <select
-                id="sunlight"
-                name="sunlight"
-                value={formState.sunlight}
-                onChange={onFormChange}
-                className={styles.select}
-                aria-label="Sunlight"
-              >
-                <option value="">Exposure</option>
-                <option value="very_low">Very Low (no direct light)</option>
-                <option value="low">Low (little natural light)</option>
-                <option value="medium">Medium (some morning/evening sun)</option>
-                <option value="bright_indirect">Bright Indirect (filtered light)</option>
-                <option value="partial_sun">Partial Sun (direct sun for part of the day)</option>
-                <option value="full">Full Sun (direct sun most of the day)</option>
-              </select>
-            )}
-            {show('sunlightHours') && (
+      {/* Plant name */}
+      <label htmlFor="plantType" className={styles.labelWithIcon}>
+        Plant name
+        {plantNameLoading && (
+          <span className={`${styles.spinner} ${styles.smallSpinner}`} />
+        )}
+      </label>
+      <input
+        type="text"
+        id="plantType"
+        name="plantType"
+        placeholder=""
+        value={formState.plantType}
+        onChange={onFormChange}
+        className={`${styles.input} ${plantNameLoading ? styles.inputDisabled : ''}`}
+        aria-label="Plant Type"
+        disabled={plantNameLoading || plantNameDisabled}
+      />
+
+      {/* Description */}
+      <label htmlFor="description" className={styles.label}>
+        Describe the problem
+      </label>
+      <textarea
+        id="description"
+        name="description"
+        placeholder="e.g., Leaves are turning yellow and have brown spots."
+        value={formState.description}
+        onChange={onFormChange}
+        className={`${styles.input} ${styles.textarea}`}
+        aria-label="Description"
+        rows={2}
+      />
+
+      {/* Pests */}
+      <div className={styles.fieldGroup}>
+        <label className={styles.fieldLabel}>Any bugs crawling around?</label>
+        <div className={styles.radioGroupWithReset}>
+          <div className={styles.radioGroup}>
+            <label className={styles.radioLabel}>
               <input
-                type="text"
-                id="sunlightHours"
-                name="sunlightHours"
-                placeholder="Hours/day (e.g. 4)"
-                value={formState.sunlightHours}
+                type="radio"
+                name="pests"
+                value="yes"
+                checked={formState.pests === 'yes'}
                 onChange={onFormChange}
-                className={styles.input}
-                style={{ maxWidth: 120 }}
+                className={styles.radioInput}
               />
+              Yes
+            </label>
+            <label className={styles.radioLabel}>
+              <input
+                type="radio"
+                name="pests"
+                value="no"
+                checked={formState.pests === 'no'}
+                onChange={onFormChange}
+                className={styles.radioInput}
+              />
+              No
+            </label>
+          </div>
+          {formState.pests && (
+            <span 
+              className="slider-reset-btn"
+              onClick={() => resetRadio('pests')}
+              title="Reset"
+            >
+              ×
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Watering (frequency and amount sliders) */}
+      <div className={styles.fieldGroup}>
+        <label className={styles.fieldLabel}>Watering habits</label>
+        <div className={styles.sliderGroup}>
+          <div className={styles.sliderRow}>
+            <span className="slider-label">Frequency</span>
+            <input
+              type="range"
+              min={1}
+              max={5}
+              step={1}
+              name="wateringFrequency"
+              value={formState.wateringFrequency ?? ''}
+              onChange={e => handleSliderChange('wateringFrequency', e.target.value)}
+              className={formState.wateringFrequency ? 'active' : ''}
+            />
+            <div className="slider-value-box">
+              <span className="slider-value-text">
+                {getSliderDisplayValue('wateringFrequency', WATERING_FREQUENCY_LABELS)}
+              </span>
+              {formState.wateringFrequency && (
+                <span 
+                  className="slider-reset-btn"
+                  onClick={() => resetSlider('wateringFrequency')}
+                  title="Reset"
+                >
+                  ×
+                </span>
+              )}
+            </div>
+          </div>
+          <div className={styles.sliderRow}>
+            <span className="slider-label">Amount</span>
+            <input
+              type="range"
+              min={1}
+              max={5}
+              step={1}
+              name="wateringAmount"
+              value={formState.wateringAmount ?? ''}
+              onChange={e => handleSliderChange('wateringAmount', e.target.value)}
+              className={formState.wateringAmount ? 'active' : ''}
+            />
+            <div className="slider-value-box">
+              <span className="slider-value-text">
+                {getSliderDisplayValue('wateringAmount', WATERING_AMOUNT_LABELS)}
+              </span>
+              {formState.wateringAmount && (
+                <span 
+                  className="slider-reset-btn"
+                  onClick={() => resetSlider('wateringAmount')}
+                  title="Reset"
+                >
+                  ×
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Light slider */}
+      <div className={styles.fieldGroup}>
+        <label className={styles.fieldLabel}>Light situation</label>
+        <div className={styles.sliderRow}>
+          <span className="slider-label">Amount</span>
+          <input
+            type="range"
+            min={1}
+            max={5}
+            step={1}
+            name="sunlight"
+            value={formState.sunlight ?? ''}
+            onChange={e => handleSliderChange('sunlight', e.target.value)}
+            className={formState.sunlight ? 'active' : ''}
+          />
+          <div className="slider-value-box">
+            <span className="slider-value-text">
+              {getSliderDisplayValue('sunlight', SUNLIGHT_LABELS)}
+            </span>
+            {formState.sunlight && (
+              <span 
+                className="slider-reset-btn"
+                onClick={() => resetSlider('sunlight')}
+                title="Reset"
+              >
+                ×
+              </span>
             )}
           </div>
-        </>
-      ) : null}
-      {show('soilType') && (
-        <>
-          <label htmlFor="soilType" style={{ fontWeight: 'bold', marginTop: 12 }}>Soil/Medium</label>
-          <input
-            type="text"
-            id="soilType"
-            name="soilType"
-            placeholder="e.g., potting mix, cactus mix, hydroponic, etc."
-            value={formState.soilType}
-            onChange={onFormChange}
-            className={styles.input}
-          />
-        </>
-      )}
-      {show('fertilizer') && (
-        <>
-          <label htmlFor="fertilizer" style={{ fontWeight: 'bold', marginTop: 12 }}>Fertilizer Use</label>
-          <input
-            type="text"
-            id="fertilizer"
-            name="fertilizer"
-            placeholder="Type, frequency, last applied"
-            value={formState.fertilizer}
-            onChange={onFormChange}
-            className={styles.input}
-          />
-        </>
-      )}
-      {show('humidity') && (
-        <>
-          <label htmlFor="humidity" style={{ fontWeight: 'bold', marginTop: 12 }}>Humidity</label>
-          <input
-            type="text"
-            id="humidity"
-            name="humidity"
-            placeholder="e.g., 40%, low, medium, high"
-            value={formState.humidity}
-            onChange={onFormChange}
-            className={styles.input}
-          />
-        </>
-      )}
-      {show('temperature') && (
-        <>
-          <label htmlFor="temperature" style={{ fontWeight: 'bold', marginTop: 12 }}>Temperature Range</label>
-          <input
-            type="text"
-            id="temperature"
-            name="temperature"
-            placeholder="e.g., 18-24°C, day/night"
-            value={formState.temperature}
-            onChange={onFormChange}
-            className={styles.input}
-          />
-        </>
-      )}
-      {show('pests') && (
-        <>
-          <label htmlFor="pests" style={{ fontWeight: 'bold', marginTop: 12 }}>Pest Sightings</label>
-          <input
-            type="text"
-            id="pests"
-            name="pests"
-            placeholder="e.g., spider mites, aphids, none, not sure"
-            value={formState.pests}
-            onChange={onFormChange}
-            className={styles.input}
-          />
-        </>
-      )}
-      {show('symptoms') && (
-        <>
-          <label htmlFor="symptoms" style={{ fontWeight: 'bold', marginTop: 12 }}>Symptoms (select all that apply)</label>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 8 }}>
-            {['Yellowing leaves', 'Wilting', 'Brown spots', 'Mold/fungus', 'Leaf drop', 'Curling leaves', 'Sticky residue', 'Holes/chewed leaves'].map((symptom) => (
-              <label key={symptom} style={{ fontWeight: 'normal' }}>
-                <input
-                  type="checkbox"
-                  name="symptoms"
-                  value={symptom}
-                  checked={formState.symptoms?.includes(symptom)}
-                  onChange={(e) => {
-                    const checked = e.target.checked;
-                    const value = e.target.value;
-                    let updated = formState.symptoms || [];
-                    if (checked) {
-                      updated = [...updated, value];
-                    } else {
-                      updated = updated.filter((s) => s !== value);
-                    }
-                    onFormChange({
-                      ...e,
-                      target: { ...e.target, name: 'symptoms', value: updated }
-                    } as any);
-                  }}
-                />
-                {symptom}
-              </label>
-            ))}
+        </div>
+      </div>
+
+      {/* Details/extra fields button and section */}
+      <details className={styles.detailsContainer} open={detailsOpen} onToggle={e => setDetailsOpen(e.currentTarget.open)}>
+        <summary className={styles.detailsSummary}>
+          Provide more information
+        </summary>
+        {detailsOpen && (
+          <div className={styles.detailsContent}>
+            <label htmlFor="soilType" className={styles.detailLabel}>Soil type</label>
+            <input
+              type="text"
+              id="soilType"
+              name="soilType"
+              placeholder="e.g., potting mix, cactus mix, hydroponic, etc."
+              value={formState.soilType}
+              onChange={onFormChange}
+              className={styles.input}
+            />
+
+            <label htmlFor="potDetails" className={styles.detailLabel}>Pot details</label>
+            <input
+              type="text"
+              id="potDetails"
+              name="potDetails"
+              placeholder="Size, drainage, repotting history"
+              value={formState.potDetails}
+              onChange={onFormChange}
+              className={styles.input}
+            />
+
+            <label htmlFor="fertilizer" className={styles.detailLabel}>Fertilizer use</label>
+            <input
+              type="text"
+              id="fertilizer"
+              name="fertilizer"
+              placeholder="Type, frequency, last applied"
+              value={formState.fertilizer}
+              onChange={onFormChange}
+              className={styles.input}
+            />
+
+            <label htmlFor="humidity" className={styles.detailLabel}>Humidity</label>
+            <input
+              type="text"
+              id="humidity"
+              name="humidity"
+              placeholder="e.g., 40%, low, medium, high"
+              value={formState.humidity}
+              onChange={onFormChange}
+              className={styles.input}
+            />
+
+            <label htmlFor="temperature" className={styles.detailLabel}>Temperature range</label>
+            <input
+              type="text"
+              id="temperature"
+              name="temperature"
+              placeholder="e.g., 18-24°C"
+              value={formState.temperature}
+              onChange={onFormChange}
+              className={styles.input}
+            />
+
+            <label htmlFor="symptoms" className={styles.detailLabel}>Symptoms (select all that apply)</label>
+            <div className={styles.checkboxGroup}>
+              {['Yellowing leaves', 'Wilting', 'Brown spots', 'Mold/fungus', 'Leaf drop', 'Curling leaves', 'Sticky residue', 'Holes/chewed leaves'].map((symptom) => (
+                <label key={symptom} className={styles.checkboxLabel}>
+                  <input
+                    type="checkbox"
+                    name="symptoms"
+                    value={symptom}
+                    checked={formState.symptoms?.includes(symptom)}
+                    onChange={(e) => {
+                      const checked = e.target.checked;
+                      const value = e.target.value;
+                      let updated = formState.symptoms || [];
+                      if (checked) {
+                        updated = [...updated, value];
+                      } else {
+                        updated = updated.filter((s) => s !== value);
+                      }
+                      onFormChange({
+                        ...e,
+                        target: { ...e.target, name: 'symptoms', value: updated }
+                      } as any);
+                    }}
+                  />
+                  {symptom}
+                </label>
+              ))}
+            </div>
+
+            <label htmlFor="recentChanges" className={styles.detailLabel}>Recent changes</label>
+            <input
+              type="text"
+              id="recentChanges"
+              name="recentChanges"
+              placeholder="Recent changes in care, location, etc."
+              value={formState.recentChanges}
+              onChange={onFormChange}
+              className={styles.input}
+            />
+
+            <label htmlFor="plantAge" className={styles.detailLabel}>Plant age</label>
+            <input
+              type="text"
+              id="plantAge"
+              name="plantAge"
+              placeholder="Approximate age of the plant"
+              value={formState.plantAge}
+              onChange={onFormChange}
+              className={styles.input}
+            />
           </div>
-        </>
-      )}
-      {show('potDetails') && (
-        <>
-          <label htmlFor="potDetails" style={{ fontWeight: 'bold', marginTop: 12 }}>Pot/Container Details</label>
-          <input
-            type="text"
-            id="potDetails"
-            name="potDetails"
-            placeholder="Pot size, drainage, repotting history"
-            value={formState.potDetails}
-            onChange={onFormChange}
-            className={styles.input}
-          />
-        </>
-      )}
-      {show('recentChanges') && (
-        <>
-          <label htmlFor="recentChanges" style={{ fontWeight: 'bold', marginTop: 12 }}>Recent Changes</label>
-          <input
-            type="text"
-            id="recentChanges"
-            name="recentChanges"
-            placeholder="Any recent changes in care, location, etc."
-            value={formState.recentChanges}
-            onChange={onFormChange}
-            className={styles.input}
-          />
-        </>
-      )}
-      {show('plantAge') && (
-        <>
-          <label htmlFor="plantAge" style={{ fontWeight: 'bold', marginTop: 12 }}>Plant Age</label>
-          <input
-            type="text"
-            id="plantAge"
-            name="plantAge"
-            placeholder="Approximate age of the plant"
-            value={formState.plantAge}
-            onChange={onFormChange}
-            className={styles.input}
-          />
-        </>
-      )}
+        )}
+      </details>
     </>
   );
 };

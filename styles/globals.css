@@ -1,0 +1,277 @@
+/* Standardized Grey Color Palette */
+:root {
+  /* Text Colors */
+  --grey-900: #1a1a1a;  /* Primary text */
+  --grey-700: #333;     /* Secondary text */
+  --grey-600: #555;     /* Tertiary text */
+  --grey-500: #888;     /* Muted text */
+  
+  /* Background Colors */
+  --grey-50: #fafbfc;   /* Lightest background */
+  --grey-100: #f7f7f7;  /* Light background */
+  --grey-200: #eee;     /* Medium-light background */
+  
+  /* Border Colors */
+  --grey-300: #ddd;     /* Light border */
+  --grey-400: #ccc;     /* Medium border */
+  
+  /* Interactive Colors */
+  --grey-hover-400: #bbb; /* Hover states */
+  --grey-hover-600: #777; /* Darker hover states */
+  
+  /* Brand Colors (keeping existing) */
+  --green-primary: #308300;
+  --green-dark: #1f5500;
+  --red-primary: #dc3545;
+  --red-dark: #c82333;
+}
+
+/* Global slider and radio button styling for app theme */
+input[type="range"] {
+  width: min(40vw, 180px);
+  height: 8px;
+  margin: 0 8px;
+  background: transparent;
+  cursor: pointer;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  flex: 1;
+  min-width: 60px;
+}
+
+@media (max-width: 768px) {
+  input[type="range"] {
+    margin: 0 6px;
+    min-width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  input[type="range"] {
+    margin: 0 4px;
+    min-width: 40px;
+  }
+}
+
+/* Default grey thumb */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--grey-500);
+  border: none;
+  box-shadow: none;
+  margin-top: -4px;
+  transition: background 0.18s;
+}
+input[type="range"]:hover::-webkit-slider-thumb,
+input[type="range"]:active::-webkit-slider-thumb {
+  background: var(--grey-hover-600);
+}
+
+/* Green thumb when active */
+input[type="range"].active::-webkit-slider-thumb {
+  background: var(--green-primary);
+}
+input[type="range"].active:hover::-webkit-slider-thumb,
+input[type="range"].active:active::-webkit-slider-thumb {
+  background: var(--green-dark);
+}
+input[type="range"].active:hover::-webkit-slider-thumb,
+input[type="range"].active:active::-webkit-slider-thumb {
+  background: #1f5500;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 4px;
+  background: #e0e0e0;
+}
+
+/* Firefox styles */
+input[type="range"]::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--grey-500);
+  border: none;
+  box-shadow: none;
+  transition: background 0.18s;
+}
+input[type="range"]:hover::-moz-range-thumb,
+input[type="range"]:active::-moz-range-thumb {
+  background: var(--grey-hover-600);
+}
+input[type="range"].active::-moz-range-thumb {
+  background: var(--green-primary);
+}
+input[type="range"].active:hover::-moz-range-thumb,
+input[type="range"].active:active::-moz-range-thumb {
+  background: var(--green-dark);
+}
+input[type="range"]::-moz-range-track {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--grey-200);
+}
+
+/* IE styles */
+input[type="range"]::-ms-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--grey-500);
+  border: none;
+  box-shadow: none;
+  transition: background 0.18s;
+}
+input[type="range"]:hover::-ms-thumb,
+input[type="range"]:active::-ms-thumb {
+  background: var(--grey-hover-600);
+}
+input[type="range"].active::-ms-thumb {
+  background: var(--green-primary);
+}
+input[type="range"].active:hover::-ms-thumb,
+input[type="range"].active:active::-ms-thumb {
+  background: var(--green-dark);
+}
+
+/* Slider value box */
+.slider-value-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 160px;
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid #e1e5e9;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  font-size: 12px;
+  color: #374151;
+  line-height: 1.4;
+  vertical-align: middle;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.slider-value-box:hover {
+  border-color: #d1d5db;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+@media (max-width: 768px) {
+  .slider-value-box {
+    width: 140px;
+    height: 30px;
+    font-size: 11px;
+    padding: 0 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .slider-value-box {
+    width: 120px;
+    height: 28px;
+    font-size: 10px;
+    padding: 0 8px;
+  }
+}
+
+.slider-value-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+/* Reset button - modern subtle design */
+.slider-reset-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  margin-left: 6px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(107, 114, 128, 0.1);
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  text-align: center;
+  opacity: 0.7;
+}
+
+.slider-reset-btn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+.slider-reset-btn:active {
+  transform: scale(0.95);
+  transition: all 0.1s ease;
+}
+
+@media (max-width: 768px) {
+  .slider-reset-btn {
+    width: 16px;
+    height: 16px;
+    font-size: 11px;
+    margin-left: 4px;
+  }
+}
+
+@media (max-width: 480px) {
+  .slider-reset-btn {
+    width: 14px;
+    height: 14px;
+    font-size: 10px;
+    margin-left: 3px;
+  }
+}
+
+input[type="radio"] {
+  accent-color: #308300;
+  width: 18px;
+  height: 18px;
+  margin-right: 4px;
+  vertical-align: middle;
+  cursor: pointer;
+  transition: accent-color 0.2s;
+}
+input[type="radio"]:hover {
+  accent-color: #308300;
+}
+
+/* Slider label styling */
+.slider-label {
+  width: 70px;
+  font-size: 12px;
+  color: #555;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+@media (max-width: 480px) {
+  .slider-label {
+    width: 60px;
+  }
+}
