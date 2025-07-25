@@ -82,6 +82,26 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ files, onFilesChange }) =
     fileInputRef.current?.click();
   };
 
+  const openCamera = () => {
+    // Create a temporary input for camera capture
+    const cameraInput = document.createElement('input');
+    cameraInput.type = 'file';
+    cameraInput.accept = 'image/*';
+    cameraInput.capture = 'environment';
+    cameraInput.style.display = 'none';
+    
+    cameraInput.onchange = async (e) => {
+      const target = e.target as HTMLInputElement;
+      if (target.files && target.files.length > 0) {
+        await processFiles(target.files);
+      }
+      document.body.removeChild(cameraInput);
+    };
+    
+    document.body.appendChild(cameraInput);
+    cameraInput.click();
+  };
+
   const hasFiles = files.length > 0;
   const canAddMore = files.length < MAX_FILES;
 
@@ -132,6 +152,17 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ files, onFilesChange }) =
           </div>
         )}
       </div>
+
+      {/* Camera button */}
+      {canAddMore && (
+        <button 
+          type="button"
+          onClick={openCamera}
+          className={styles.cameraButton}
+        >
+          Take Photo
+        </button>
+      )}
 
       {/* Image previews */}
       {hasFiles && (

@@ -166,3 +166,30 @@
     right: 4px;
   }
 }
+
+.cameraButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border: 2px solid var(--grey-300);
+  border-radius: 8px;
+  background: var(--grey-100);
+  color: var(--grey-700);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  align-self: center;
+}
+
+.cameraButton:hover {
+  border-color: #76a15c;
+  background: var(--grey-50);
+  color: #76a15c;
+}
+
+.cameraButton:active {
+  transform: scale(0.98);
+}
