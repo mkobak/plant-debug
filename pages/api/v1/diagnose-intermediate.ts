@@ -71,6 +71,7 @@ export default async function handler(
         .filter(d => d.length > 0);
 
       console.log("Final ranked diagnoses array for UI:", rankedDiagnosesArray);
+      console.log("Raw ranked diagnoses string:", rankedDiagnoses);
       res.status(200).json({ rankedDiagnoses: rankedDiagnosesArray });
 
     } catch (error: any) {

@@ -145,13 +145,32 @@ export const rankDiagnoses = async (model: any, diagnosisResults: string[]) => {
   const allDiagnoses = diagnosisResults
     .flatMap(result => result.split(','))
     .map(d => d.trim())
-    .filter(d => d.length > 0 && d !== 'No plant detected' && d !== 'Plant is healthy');
   
   console.log("Parsed individual diagnoses:", allDiagnoses);
   
+  // Check if majority of experts say the plant is healthy
+  const healthyCount = allDiagnoses.filter(d => d === 'Plant is healthy').length;
+  const totalResponses = diagnosisResults.filter(r => r.trim().length > 0).length;
+  
+  console.log(`Healthy responses: ${healthyCount} out of ${totalResponses} total responses`);
+  
+  // If majority says plant is healthy, return that as the consensus
+  if (healthyCount >= Math.ceil(totalResponses / 2)) {
+    console.log("Majority consensus: Plant is healthy");
+    return "Plant is healthy";
+  }
+  
+  // Otherwise, filter out healthy responses and rank actual diagnoses
+  const problemDiagnoses = allDiagnoses.filter(d => d !== 'Plant is healthy');
+  
+  if (problemDiagnoses.length === 0) {
+    console.log("No problem diagnoses found after filtering");
+    return "";
+  }
+  
   const rankingPrompt = `
     You are an expert plant pathologist. I have collected these plant diagnosis suggestions from multiple experts:
-    ${allDiagnoses.join(', ')}
+    ${problemDiagnoses.join(', ')}
     
     Please group similar diagnoses together and rank them by frequency/consensus. 
     Output ONLY a ranked list of the most likely diagnoses, most frequent first, comma-separated.
@@ -185,63 +204,30 @@ export const getDiagnosisTools = () => {
   return [
     {
       function_declarations: [
-        {
-          name: "plant_diagnosis",
-          description: "Diagnose plant issues and provide brief explanations, treatment and prevention tips.",
-          parameters: {
-            type: "object",
-            properties: {
-              plant: { 
-                type: "string", 
-                description: "Name of the plant in the pictures, both the common name and scientific name. If the user provided the name of the plant, verify it is correct. If it's not, provide the name of the plant that you identify from the pictures. Only provide the name of the plant and nothing else." 
-              },
-              primaryDiagnosis: { 
-                type: "string", 
-                description: "Most likely (primary) diagnosis based on the pictures and context." 
-              },
-              primaryConfidence: { 
-                type: "string", 
-                enum: ["High", "Medium", "Low"], 
-                description: "Confidence level in the primary diagnosis. Rate your confidence in your diagnosis realistically given the available information." 
-              },
-              primaryReasoning: { 
-                type: "string", 
-                description: "Brief explanation of how the primary diagnosis was reached, referencing visual evidence and user context, in Markdown." 
-              },
-              primaryTreatmentPlan: { 
-                type: "string", 
-                description: "Brief step-by-step guide for the user to resolve the issue in case of the primary diagnosis, in Markdown." 
-              },
-              primaryPreventionTips: { 
-                type: "string", 
-                description: "Brief actionable advice to prevent recurrence in case of the primary diagnosis, in Markdown." 
-              },
-              secondaryDiagnosis: { 
-                type: "string", 
-                description: "Secondary diagnosis in case there is another likely possibility of what the issue with the plant could be, other than the primary diagnosis." 
-              },
-              secondaryConfidence: { 
-                type: "string", 
-                enum: ["High", "Medium", "Low"], 
-                description: "Confidence level in the secondary diagnosis." 
-              },
-              secondaryReasoning: { 
-                type: "string", 
-                description: "Brief explanation of how the secondary diagnosis was reached, referencing visual evidence and user context, in Markdown." 
-              },
-              secondaryTreatmentPlan: { 
-                type: "string", 
-                description: "Brief step-by-step guide for the user to resolve the issue in case of the secondary diagnosis, in Markdown." 
-              },
-              secondaryPreventionTips: { 
-                type: "string", 
-                description: "Brief actionable advice to prevent recurrence in case of the secondary diagnosis, in Markdown." 
+            {
+              name: "plant_diagnosis",
+              description: "Diagnose plant issues and provide brief explanations, treatment and prevention tips.",
+              parameters: {
+                type: "object",
+                properties: {
+                  plant: { type: "string", description: "Name of the plant in the pictures, both the common name and scientific name. If the user provided the name of the plant, verify it is correct. If it's not, provide the name of the plant that you identify from the pictures. Only provide the name of the plant and nothing else." },
+                  primaryDiagnosis: { type: "string", description: "Most likely (primary) diagnosis based on the pictures and context." },
+                  primaryConfidence: { type: "string", enum: ["High", "Medium", "Low"], description: "Confidence level in the primary diagnosis. Rate your confidence in your diagnosis realistically given the available information." },
+                  primaryReasoning: { type: "string", description: "Brief explanation of how the primary diagnosis was reached, referencing visual evidence and user context, in Markdown." },
+                  primaryTreatmentPlan: { type: "string", description: "Brief step-by-step guide for the user to resolve the issue in case of the primary diagnosis, in Markdown." },
+                  primaryPreventionTips: { type: "string", description: "Brief actionable advice to prevent recurrence in case of the primary diagnosis, in Markdown." },
+                  secondaryDiagnosis: { type: "string", description: "Secondary diagnosis in case there is another likely possibility of what the issue with the plant could be, other than the primary diagnosis." },
+                  secondaryConfidence: { type: "string", enum: ["High", "Medium", "Low"], description: "Confidence level in the secondary diagnosis." },
+                  secondaryReasoning: { type: "string", description: "Brief explanation of how the secondary diagnosis was reached, referencing visual evidence and user context, in Markdown." },
+                  secondaryTreatmentPlan: { type: "string", description: "Brief step-by-step guide for the user to resolve the issue in case of the secondary diagnosis, in Markdown." },
+                  secondaryPreventionTips: { type: "string", description: "Brief actionable advice to prevent recurrence in case of the secondary diagnosis, in Markdown." }
+
+                },
+                required: ["plant", "primaryDiagnosis", "primaryConfidence", "primaryReasoning", "primaryTreatmentPlan", "primaryPreventionTips"]
               }
-            },
-            required: ["plant", "primaryDiagnosis", "primaryConfidence", "primaryReasoning", "primaryTreatmentPlan", "primaryPreventionTips"]
-          }
-        }
-      ]
+            }
+          ]
+
     }
   ] as unknown as import('@google/generative-ai').Tool[];
 };
