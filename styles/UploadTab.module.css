@@ -23,7 +23,7 @@
   color: var(--grey-800);
   margin: 0;
   padding-bottom: 0.5rem;
-  border-bottom: 2px solid var(--grey-300);
+  border-bottom: 1px solid var(--grey-300);
 }
 
 .tip {

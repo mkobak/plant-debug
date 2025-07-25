@@ -67,25 +67,47 @@ App runs locally at `http://localhost:3000`
 │   ├── ContextForm.tsx   # Plant care context form
 │   ├── DiagnosisResult.tsx # Results display component
 │   └── ImageUploader.tsx # Image upload component
+├── constants/            # Application constants
+│   └── sliderLabels.ts   # Slider value mappings
 ├── hooks/                # Custom React hooks
 │   ├── usePlantForm.ts   # Form state and API management
 │   └── useTabNavigation.ts # Tab navigation logic
 ├── pages/
 │   ├── api/v1/           # API endpoints
 │   │   ├── diagnose.ts   # Main diagnosis endpoint
+│   │   ├── diagnose-intermediate.ts # Intermediate diagnosis step
 │   │   └── identify-plant.ts # Plant identification endpoint
 │   ├── _app.tsx          # Next.js app wrapper
 │   └── index.tsx         # Main application page
+├── public/               # Static assets
+│   └── logo.png          # Main logo
 ├── styles/               # CSS modules
-│   ├── globals.css       # Global styles (sliders, radio buttons)
-│   └── *.module.css      # Component-specific styles
+│   ├── globals.css       # Global styles (variables, sliders, radio buttons)
+│   ├── Home.module.css   # Main page styles
+│   ├── Button.module.css # Button component styles
+│   ├── ButtonGroup.module.css # Button group styles
+│   ├── ContextForm.module.css # Context form styles
+│   ├── DiagnosisResult.module.css # Results display styles
+│   ├── ErrorMessage.module.css # Error message styles
+│   ├── ImageUploader.module.css # Image uploader styles
+│   ├── InfoTab.module.css # Info tab styles
+│   ├── LoadingSpinner.module.css # Loading spinner styles
+│   ├── ResultsTab.module.css # Results tab styles
+│   ├── TabBar.module.css # Tab bar styles
+│   └── UploadTab.module.css # Upload tab styles
 ├── types/                # TypeScript type definitions
-│   └── index.ts
+│   └── index.ts          # Main type definitions
 ├── utils/                # Utility functions
 │   ├── formUtils.ts      # Form data utilities
+│   ├── geminiHelpers.ts  # Gemini API helper functions
 │   └── imageCompression.ts # Image compression utilities
-└── constants/            # Application constants
-    └── sliderLabels.ts   # Slider value mappings
+├── .env.local            # Environment variables (not tracked)
+├── .gitignore            # Git ignore rules
+├── next-env.d.ts         # Next.js TypeScript declarations
+├── package.json          # Project dependencies and scripts
+├── package-lock.json     # Dependency lock file
+├── README.md             # Project documentation
+└── tsconfig.json         # TypeScript configuration
 ```
 
 

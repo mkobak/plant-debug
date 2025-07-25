@@ -30,7 +30,7 @@ export const ResultsTab: React.FC<ResultsTabProps> = ({
         )}
         {isLoading && intermediateDiagnosis && (
           <LoadingSpinner 
-            message={`Investigating possible bugs: ${intermediateDiagnosis.rankedDiagnoses.join(', ')}.`} 
+            message={`Investigating possible bugs: ${intermediateDiagnosis.rankedDiagnoses.join(', ')}...`} 
           />
         )}
         {error && <ErrorMessage message={error} />}
