@@ -101,7 +101,6 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ files, onFilesChange }) =
           type="file"
           onChange={handleFileChange}
           accept="image/*"
-          capture="environment"
           multiple
           className={styles.fileInput}
           disabled={!canAddMore}
