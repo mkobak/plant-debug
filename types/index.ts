@@ -25,11 +25,13 @@ export interface DiagnosisResponse {
   primaryReasoning: string;
   primaryTreatmentPlan: string;
   primaryPreventionTips: string;
+  primarySummary?: string;
   secondaryDiagnosis?: string;
   secondaryConfidence?: 'High' | 'Medium' | 'Low';
   secondaryReasoning?: string;
   secondaryTreatmentPlan?: string;
   secondaryPreventionTips?: string;
+  secondarySummary?: string;
 }
 
 export interface IntermediateDiagnosisResponse {

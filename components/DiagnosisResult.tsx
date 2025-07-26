@@ -38,6 +38,13 @@ export const DiagnosisResult: React.FC<DiagnosisResultProps> = ({ diagnosis }) =
         </span>
       </div>
 
+      {diagnosis.primarySummary && (
+        <div className={`${styles.section} ${styles.summarySection}`}>
+          <h3>Summary</h3>
+          <ReactMarkdown>{diagnosis.primarySummary}</ReactMarkdown>
+        </div>
+      )}
+
       <div className={styles.section}>
         <h3>Reasoning</h3>
         <ReactMarkdown>{diagnosis.primaryReasoning}</ReactMarkdown>
@@ -68,6 +75,12 @@ export const DiagnosisResult: React.FC<DiagnosisResultProps> = ({ diagnosis }) =
               </span>
             )}
           </div>
+          {diagnosis.secondarySummary && (
+            <div className={`${styles.subsection} ${styles.summarySection}`}>
+              <h3>Summary</h3>
+              <ReactMarkdown>{diagnosis.secondarySummary}</ReactMarkdown>
+            </div>
+          )}
           {diagnosis.secondaryReasoning && (
             <div className={styles.subsection}>
               <h3>Reasoning</h3>

@@ -5,7 +5,8 @@ import {
   initializeGemini, 
   bufferToGenerativePart, 
   buildContextLines, 
-  getDiagnosisTools 
+  getDiagnosisTools,
+  generateSummary
 } from '../../../utils/geminiHelpers';
 
 // Disable Next.js body parsing to allow formidable to handle the stream
@@ -24,7 +25,7 @@ export default async function handler(
       return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const { modelPro } = initializeGemini();
+    const { modelPro, modelFlashLite } = initializeGemini();
 
     try {
       const form = formidable({});
@@ -110,8 +111,25 @@ export default async function handler(
         const functionCall = response.candidates?.[0]?.content?.parts?.[0]?.functionCall;
         if (functionCall && functionCall.args) {
           const jsonResponse = functionCall.args;
-          console.log("Final diagnosis response being sent to client:", JSON.stringify(jsonResponse, null, 2));
-          res.status(200).json(jsonResponse);
+          
+          // Generate summaries using Flash Lite
+          let summaries = { primarySummary: "", secondarySummary: "" };
+          try {
+            summaries = await generateSummary(modelFlashLite, jsonResponse);
+          } catch (summaryError) {
+            console.error("Failed to generate summaries:", summaryError);
+            // Continue without summaries if it fails
+          }
+          
+          // Add summaries to response if generated successfully
+          const finalResponse = {
+            ...jsonResponse,
+            ...(summaries.primarySummary && { primarySummary: summaries.primarySummary }),
+            ...(summaries.secondarySummary && { secondarySummary: summaries.secondarySummary })
+          };
+          
+          console.log("Final diagnosis response being sent to client:", JSON.stringify(finalResponse, null, 2));
+          res.status(200).json(finalResponse);
         } else {
           throw new Error("No structured function call response from Gemini.");
         }

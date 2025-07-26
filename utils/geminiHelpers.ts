@@ -199,6 +199,96 @@ export const rankDiagnoses = async (model: any, diagnosisResults: string[]) => {
   return rankedDiagnoses;
 };
 
+// Generate summary from detailed diagnosis
+export const generateSummary = async (model: any, diagnosis: any) => {
+  try {
+    // Generate primary summary
+    const primarySummaryPrompt = `
+      You are a plant expert. Based on the primary diagnosis details below, create a concise bullet-point summary of the most important information.
+      
+      Focus on:
+      • Key findings (what's wrong and why)
+      • Essential treatment steps (prioritized)
+      • Critical prevention measures
+      
+      Keep it concise - maximum 4-5 bullet points total. Use clear, actionable language.
+      Output ONLY the bullet points, no introductory text or subtitles.
+      
+      Primary diagnosis details:
+      Diagnosis: ${diagnosis.primaryDiagnosis} (${diagnosis.primaryConfidence} confidence)
+      Reasoning: ${diagnosis.primaryReasoning}
+      Treatment: ${diagnosis.primaryTreatmentPlan}
+      Prevention: ${diagnosis.primaryPreventionTips}
+    `;
+    
+    console.log("Generating primary summary with Flash Lite...");
+    
+    const primaryResult = await model.generateContent({
+      contents: [{ role: "user", parts: [{ text: primarySummaryPrompt }] }],
+      generationConfig: { temperature: 0.1, topP: 0.5 }
+    });
+    
+    const primaryResponse = await primaryResult.response;
+    let primarySummary = "";
+    try {
+      primarySummary = primaryResponse.text().trim();
+    } catch {
+      primarySummary = "";
+    }
+    
+    console.log("Generated primary summary:", primarySummary);
+    
+    // Generate secondary summary if secondary diagnosis exists
+    let secondarySummary = "";
+    if (diagnosis.secondaryDiagnosis && diagnosis.secondaryDiagnosis.trim()) {
+      const secondarySummaryPrompt = `
+        You are a plant expert. Based on the secondary diagnosis details below, create a concise bullet-point summary of the most important information.
+        
+        Focus on:
+        • Key findings (what's wrong and why)
+        • Essential treatment steps (prioritized)
+        • Critical prevention measures
+        
+        Keep it concise - maximum 4-5 bullet points total. Use clear, actionable language.
+        Output ONLY the bullet points, no introductory text or subtitles.
+        
+        Secondary diagnosis details:
+        Diagnosis: ${diagnosis.secondaryDiagnosis} (${diagnosis.secondaryConfidence || 'Unknown'} confidence)
+        Reasoning: ${diagnosis.secondaryReasoning || 'N/A'}
+        Treatment: ${diagnosis.secondaryTreatmentPlan || 'N/A'}
+        Prevention: ${diagnosis.secondaryPreventionTips || 'N/A'}
+      `;
+      
+      console.log("Generating secondary summary with Flash Lite...");
+      
+      const secondaryResult = await model.generateContent({
+        contents: [{ role: "user", parts: [{ text: secondarySummaryPrompt }] }],
+        generationConfig: { temperature: 0.1, topP: 0.5 }
+      });
+      
+      const secondaryResponse = await secondaryResult.response;
+      try {
+        secondarySummary = secondaryResponse.text().trim();
+      } catch {
+        secondarySummary = "";
+      }
+      
+      console.log("Generated secondary summary:", secondarySummary);
+    }
+    
+    return {
+      primarySummary,
+      secondarySummary
+    };
+  } catch (error) {
+    console.error("Error generating summaries:", error);
+    return {
+      primarySummary: "",
+      secondarySummary: ""
+    };
+  }
+};
+
 // Define the function tool for structured output
 export const getDiagnosisTools = () => {
   return [

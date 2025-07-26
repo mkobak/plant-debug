@@ -93,6 +93,16 @@ const Home: NextPage = () => {
     }
   };
 
+  const handleLogoClick = () => {
+    // Navigate back to first tab without resetting form data
+    navigateViaButton(0);
+    
+    // Adjust header behavior for mobile when going back to tab 0
+    if (isMobile && compactActivated) {
+      setHeaderCompact(false);
+    }
+  };
+
   const renderTabContent = () => {
     switch (activeTab) {
       case 0:
@@ -140,9 +150,15 @@ const Home: NextPage = () => {
               src="/logo.png" 
               alt="Plant Debug Logo" 
               className={styles.logo}
+              onClick={handleLogoClick}
+              style={{ cursor: 'pointer' }}
             />
             <div className={styles.titleContainer}>
-              <h1 className={styles.title}>
+              <h1 
+                className={styles.title}
+                onClick={handleLogoClick}
+                style={{ cursor: 'pointer' }}
+              >
                 Plant Debugger
               </h1>
             </div>
