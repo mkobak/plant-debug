@@ -127,6 +127,12 @@
   height: 100%;
   object-fit: cover;
   border-radius: 10px;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.previewImage:hover {
+  opacity: 0.8;
 }
 
 .removeButton {

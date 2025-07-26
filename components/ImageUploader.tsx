@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import styles from '../styles/ImageUploader.module.css';
 import { compressImage } from '../utils/imageCompression';
+import { ImageModal } from './common';
 
 interface ImageUploaderProps {
   files: File[];
@@ -9,6 +10,7 @@ interface ImageUploaderProps {
 
 const ImageUploader: React.FC<ImageUploaderProps> = ({ files, onFilesChange }) => {
   const [isDragging, setIsDragging] = useState(false);
+  const [modalImage, setModalImage] = useState<{ src: string; alt: string; index: number } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const MAX_FILES = 3;
@@ -102,6 +104,42 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ files, onFilesChange }) =
     cameraInput.click();
   };
 
+  const handleImageClick = (file: File, index: number) => {
+    setModalImage({
+      src: URL.createObjectURL(file),
+      alt: `Plant image ${index + 1}`,
+      index: index
+    });
+  };
+
+  const closeModal = () => {
+    setModalImage(null);
+  };
+
+  const handlePrevious = () => {
+    if (modalImage && modalImage.index > 0) {
+      const newIndex = modalImage.index - 1;
+      const file = files[newIndex];
+      setModalImage({
+        src: URL.createObjectURL(file),
+        alt: `Plant image ${newIndex + 1}`,
+        index: newIndex
+      });
+    }
+  };
+
+  const handleNext = () => {
+    if (modalImage && modalImage.index < files.length - 1) {
+      const newIndex = modalImage.index + 1;
+      const file = files[newIndex];
+      setModalImage({
+        src: URL.createObjectURL(file),
+        alt: `Plant image ${newIndex + 1}`,
+        index: newIndex
+      });
+    }
+  };
+
   const hasFiles = files.length > 0;
   const canAddMore = files.length < MAX_FILES;
 
@@ -172,7 +210,9 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ files, onFilesChange }) =
               <img 
                 src={URL.createObjectURL(file)} 
                 alt={`Preview ${index + 1}`} 
-                className={styles.previewImage} 
+                className={styles.previewImage}
+                onClick={() => handleImageClick(file, index)}
+                style={{ cursor: 'pointer' }}
               />
               <button 
                 type="button" 
@@ -186,6 +226,18 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ files, onFilesChange }) =
           ))}
         </div>
       )}
+
+      {/* Image Modal */}
+      <ImageModal
+        isOpen={modalImage !== null}
+        imageSrc={modalImage?.src || ''}
+        imageAlt={modalImage?.alt || ''}
+        onClose={closeModal}
+        currentIndex={modalImage?.index}
+        totalImages={files.length}
+        onPrevious={handlePrevious}
+        onNext={handleNext}
+      />
     </div>
   );
 };

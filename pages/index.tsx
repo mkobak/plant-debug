@@ -134,6 +134,7 @@ const Home: NextPage = () => {
             isLoading={isLoading}
             error={error}
             onReset={handleReset}
+            files={files}
           />
         );
       default:

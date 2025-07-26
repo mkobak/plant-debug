@@ -10,6 +10,7 @@ interface ResultsTabProps {
   isLoading: boolean;
   error: string | null;
   onReset: () => void;
+  files: File[];
 }
 
 export const ResultsTab: React.FC<ResultsTabProps> = ({
@@ -17,7 +18,8 @@ export const ResultsTab: React.FC<ResultsTabProps> = ({
   intermediateDiagnosis,
   isLoading,
   error,
-  onReset
+  onReset,
+  files
 }) => {
   return (
     <div className={styles.container}>
@@ -34,7 +36,7 @@ export const ResultsTab: React.FC<ResultsTabProps> = ({
           />
         )}
         {error && <ErrorMessage message={error} />}
-        {diagnosis && <DiagnosisResult diagnosis={diagnosis} />}
+        {diagnosis && <DiagnosisResult diagnosis={diagnosis} files={files} />}
       </div>
       
       <div className={styles.actions}>
