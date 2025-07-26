@@ -32,6 +32,23 @@ const ContextForm: React.FC<ContextFormProps> = ({ formState, onFormChange, plan
     } as React.ChangeEvent<HTMLInputElement>);
   };
 
+  // Helper function to reset watering sliders
+  const resetWateringSliders = () => {
+    onFormChange({
+      target: { name: 'wateringFrequency', value: '' }
+    } as React.ChangeEvent<HTMLInputElement>);
+    onFormChange({
+      target: { name: 'wateringAmount', value: '' }
+    } as React.ChangeEvent<HTMLInputElement>);
+  };
+
+  // Helper function to reset light slider
+  const resetLightSlider = () => {
+    onFormChange({
+      target: { name: 'sunlight', value: '' }
+    } as React.ChangeEvent<HTMLInputElement>);
+  };
+
   // Helper function to reset a radio button
   const resetRadio = (fieldName: string) => {
     onFormChange({
@@ -116,7 +133,6 @@ const ContextForm: React.FC<ContextFormProps> = ({ formState, onFormChange, plan
               onClick={() => resetRadio('pests')}
               title="Reset"
             >
-              ×
             </span>
           )}
         </div>
@@ -124,7 +140,17 @@ const ContextForm: React.FC<ContextFormProps> = ({ formState, onFormChange, plan
 
       {/* Watering (frequency and amount sliders) */}
       <div className={styles.fieldGroup}>
-        <label className={styles.fieldLabel}>Watering habits</label>
+        <div className={styles.fieldLabelWithReset}>
+          <label className={styles.fieldLabel}>Watering habits</label>
+          {(formState.wateringFrequency || formState.wateringAmount) && (
+            <span 
+              className="slider-reset-btn slider-reset-section"
+              onClick={resetWateringSliders}
+              title="Reset watering settings"
+            >
+            </span>
+          )}
+        </div>
         <div className={styles.sliderGroup}>
           <div className={styles.sliderRow}>
             <span className="slider-label">Frequency</span>
@@ -138,19 +164,10 @@ const ContextForm: React.FC<ContextFormProps> = ({ formState, onFormChange, plan
               onChange={e => handleSliderChange('wateringFrequency', e.target.value)}
               className={formState.wateringFrequency ? 'active' : ''}
             />
-            <div className="slider-value-box">
+            <div className="slider-value-box" title={getSliderDisplayValue('wateringFrequency', WATERING_FREQUENCY_LABELS)}>
               <span className="slider-value-text">
                 {getSliderDisplayValue('wateringFrequency', WATERING_FREQUENCY_LABELS)}
               </span>
-              {formState.wateringFrequency && (
-                <span 
-                  className="slider-reset-btn"
-                  onClick={() => resetSlider('wateringFrequency')}
-                  title="Reset"
-                >
-                  ×
-                </span>
-              )}
             </div>
           </div>
           <div className={styles.sliderRow}>
@@ -165,19 +182,10 @@ const ContextForm: React.FC<ContextFormProps> = ({ formState, onFormChange, plan
               onChange={e => handleSliderChange('wateringAmount', e.target.value)}
               className={formState.wateringAmount ? 'active' : ''}
             />
-            <div className="slider-value-box">
+            <div className="slider-value-box" title={getSliderDisplayValue('wateringAmount', WATERING_AMOUNT_LABELS)}>
               <span className="slider-value-text">
                 {getSliderDisplayValue('wateringAmount', WATERING_AMOUNT_LABELS)}
               </span>
-              {formState.wateringAmount && (
-                <span 
-                  className="slider-reset-btn"
-                  onClick={() => resetSlider('wateringAmount')}
-                  title="Reset"
-                >
-                  ×
-                </span>
-              )}
             </div>
           </div>
         </div>
@@ -185,7 +193,17 @@ const ContextForm: React.FC<ContextFormProps> = ({ formState, onFormChange, plan
 
       {/* Light slider */}
       <div className={styles.fieldGroup}>
-        <label className={styles.fieldLabel}>Light situation</label>
+        <div className={styles.fieldLabelWithReset}>
+          <label className={styles.fieldLabel}>Light situation</label>
+          {formState.sunlight && (
+            <span 
+              className="slider-reset-btn slider-reset-section"
+              onClick={resetLightSlider}
+              title="Reset light settings"
+            >
+            </span>
+          )}
+        </div>
         <div className={styles.sliderRow}>
           <span className="slider-label">Amount</span>
           <input
@@ -198,19 +216,10 @@ const ContextForm: React.FC<ContextFormProps> = ({ formState, onFormChange, plan
             onChange={e => handleSliderChange('sunlight', e.target.value)}
             className={formState.sunlight ? 'active' : ''}
           />
-          <div className="slider-value-box">
+          <div className="slider-value-box" title={getSliderDisplayValue('sunlight', SUNLIGHT_LABELS)}>
             <span className="slider-value-text">
               {getSliderDisplayValue('sunlight', SUNLIGHT_LABELS)}
             </span>
-            {formState.sunlight && (
-              <span 
-                className="slider-reset-btn"
-                onClick={() => resetSlider('sunlight')}
-                title="Reset"
-              >
-                ×
-              </span>
-            )}
           </div>
         </div>
       </div>

@@ -28,8 +28,8 @@
 
 /* Global slider and radio button styling for app theme */
 input[type="range"] {
-  width: min(40vw, 180px);
-  height: 8px;
+  width: min(45vw, 200px);
+  height: 10px;
   margin: 0 8px;
   background: transparent;
   cursor: pointer;
@@ -37,20 +37,22 @@ input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
   flex: 1;
-  min-width: 60px;
+  min-width: 80px;
 }
 
 @media (max-width: 768px) {
   input[type="range"] {
     margin: 0 6px;
-    min-width: 50px;
+    min-width: 70px;
+    height: 12px;
   }
 }
 
 @media (max-width: 480px) {
   input[type="range"] {
     margin: 0 4px;
-    min-width: 40px;
+    min-width: 60px;
+    height: 14px;
   }
 }
 
@@ -58,8 +60,8 @@ input[type="range"] {
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 14px;
-  height: 14px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   background: var(--grey-500);
   border: none;
@@ -67,6 +69,23 @@ input[type="range"]::-webkit-slider-thumb {
   margin-top: -4px;
   transition: background 0.18s;
 }
+
+@media (max-width: 768px) {
+  input[type="range"]::-webkit-slider-thumb {
+    width: 20px;
+    height: 20px;
+    margin-top: -4px;
+  }
+}
+
+@media (max-width: 480px) {
+  input[type="range"]::-webkit-slider-thumb {
+    width: 22px;
+    height: 22px;
+    margin-top: -4px;
+  }
+}
+
 input[type="range"]:hover::-webkit-slider-thumb,
 input[type="range"]:active::-webkit-slider-thumb {
   background: var(--grey-hover-600);
@@ -86,21 +105,48 @@ input[type="range"].active:active::-webkit-slider-thumb {
 }
 
 input[type="range"]::-webkit-slider-runnable-track {
-  height: 6px;
+  height: 8px;
   border-radius: 4px;
   background: #e0e0e0;
 }
 
+@media (max-width: 768px) {
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 12px;
+  }
+}
+
 /* Firefox styles */
 input[type="range"]::-moz-range-thumb {
-  width: 14px;
-  height: 14px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   background: var(--grey-500);
   border: none;
   box-shadow: none;
   transition: background 0.18s;
 }
+
+@media (max-width: 768px) {
+  input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  input[type="range"]::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+  }
+}
+
 input[type="range"]:hover::-moz-range-thumb,
 input[type="range"]:active::-moz-range-thumb {
   background: var(--grey-hover-600);
@@ -118,15 +164,41 @@ input[type="range"]::-moz-range-track {
   background: var(--grey-200);
 }
 
+@media (max-width: 768px) {
+  input[type="range"]::-moz-range-track {
+    height: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  input[type="range"]::-moz-range-track {
+    height: 12px;
+  }
+}
+
 /* IE styles */
 input[type="range"]::-ms-thumb {
-  width: 14px;
-  height: 14px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   background: var(--grey-500);
   border: none;
   box-shadow: none;
   transition: background 0.18s;
+}
+
+@media (max-width: 768px) {
+  input[type="range"]::-ms-thumb {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  input[type="range"]::-ms-thumb {
+    width: 22px;
+    height: 22px;
+  }
 }
 input[type="range"]:hover::-ms-thumb,
 input[type="range"]:active::-ms-thumb {
@@ -144,9 +216,9 @@ input[type="range"].active:active::-ms-thumb {
 .slider-value-box {
   display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  width: 160px;
-  height: 32px;
+  justify-content: center;
+  width: 140px;
+  height: 35px;
   padding: 0 12px;
   border: 1px solid #e1e5e9;
   border-radius: 8px;
@@ -171,19 +243,19 @@ input[type="range"].active:active::-ms-thumb {
 
 @media (max-width: 768px) {
   .slider-value-box {
-    width: 140px;
-    height: 30px;
-    font-size: 11px;
+    width: 130px;
+    height: 35px;
+    font-size: 12px;
     padding: 0 10px;
   }
 }
 
 @media (max-width: 480px) {
   .slider-value-box {
-    width: 120px;
-    height: 28px;
+    width: 110px;
+    height: 30px;
     font-size: 10px;
-    padding: 0 8px;
+    padding: 0 4px;
   }
 }
 
@@ -193,9 +265,12 @@ input[type="range"].active:active::-ms-thumb {
   text-overflow: ellipsis;
   white-space: nowrap;
   font-weight: 500;
+  text-align: center;
+  width: 100%;
+  line-height: 1.2;
 }
 
-/* Reset button - modern subtle design */
+/* Reset button */
 .slider-reset-btn {
   display: inline-flex;
   align-items: center;
@@ -205,9 +280,8 @@ input[type="range"].active:active::-ms-thumb {
   margin-left: 6px;
   border: none;
   border-radius: 50%;
-  background: rgba(107, 114, 128, 0.1);
-  color: #6b7280;
-  font-size: 12px;
+  background: rgba(146, 146, 146, 0.3);
+  color: #525252;
   font-weight: 600;
   line-height: 1;
   cursor: pointer;
@@ -216,11 +290,23 @@ input[type="range"].active:active::-ms-thumb {
   flex-shrink: 0;
   text-align: center;
   opacity: 0.7;
+  vertical-align: middle;
+  padding: 0;
+  position: relative;
+}
+
+.slider-reset-btn::before {
+  content: "×";
+  font-size: 13px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .slider-reset-btn:hover {
-  background: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
+  background: rgba(194, 74, 74, 0.4);
+  color: #8e0000;
   opacity: 1;
   transform: scale(1.05);
 }
@@ -228,6 +314,16 @@ input[type="range"].active:active::-ms-thumb {
 .slider-reset-btn:active {
   transform: scale(0.95);
   transition: all 0.1s ease;
+}
+
+/* Section-level reset button styling */
+.slider-reset-section {
+  width: 20px;
+  height: 20px;
+  font-size: 14px;
+  margin-left: 4px;
+  margin-top: 0;
+  flex-shrink: 0;
 }
 
 @media (max-width: 768px) {
@@ -263,15 +359,30 @@ input[type="radio"]:hover {
 
 /* Slider label styling */
 .slider-label {
-  width: 70px;
-  font-size: 12px;
+  width: 75px;
+  font-size: 13px;
   color: #555;
   font-weight: 500;
   flex-shrink: 0;
 }
 
+@media (max-width: 768px) {
+  .slider-label {
+    width: 70px;
+    font-size: 12px;
+  }
+}
+
 @media (max-width: 480px) {
   .slider-label {
+    width: 65px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 360px) {
+  .slider-label {
     width: 60px;
+    font-size: 10px;
   }
 }
