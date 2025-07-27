@@ -16,6 +16,7 @@ export const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   const buttonClasses = [
+    'base-button',
     styles.button,
     styles[variant],
     loading ? styles.loading : '',
