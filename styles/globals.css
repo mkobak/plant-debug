@@ -493,6 +493,63 @@ input[type="radio"]:hover {
   }
 }
 
+/* Base tab form styling - shared across tab components */
+.base-tab-form {
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  box-shadow: none;
+  border: none;
+}
+
+.base-form-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  width: 100%;
+}
+
+.base-section-title {
+  font-size: 1.1rem;
+  color: var(--grey-800);
+  margin: 0;
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid var(--grey-300);
+}
+
+.base-tip {
+  margin-bottom: var(--spacing-sm);
+  color: var(--grey-600);
+  font-size: 0.98em;
+}
+
+/* Base button group styling */
+.base-button-group {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0;
+  width: 100%;
+  gap: var(--spacing-lg);
+}
+
+@media (max-width: 480px) {
+  .base-button-group {
+    flex-direction: row;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+  }
+  
+  .base-button-group > * {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
 @media (max-width: 768px) {
   .slider-label {
     width: 70px;

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { DiagnosisFormState, DiagnosisResponse, IntermediateDiagnosisResponse } from '../types';
-import { WATERING_FREQUENCY_LABELS, WATERING_AMOUNT_LABELS, SUNLIGHT_LABELS } from '../constants/sliderLabels';
+import { WATERING_FREQUENCY_LABELS, WATERING_AMOUNT_LABELS, SUNLIGHT_LABELS } from '../utils/constants';
 
 const initialFormState: DiagnosisFormState = {
   plantType: '',

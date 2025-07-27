@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
 import type { NextPage } from 'next';
 import styles from '../styles/Home.module.css';
 import { usePlantForm } from '../hooks/usePlantForm';
 import { useTabNavigation } from '../hooks/useTabNavigation';
-import { TabBar } from '../components/common';
+import { useHeaderState } from '../hooks/useHeaderState';
+import { TabBar, Header } from '../components/common';
 import { UploadTab, InfoTab, ResultsTab } from '../components/tabs';
 
 const Home: NextPage = () => {
@@ -30,27 +30,17 @@ const Home: NextPage = () => {
     resetNavigation 
   } = useTabNavigation();
   
-  const [headerCompact, setHeaderCompact] = useState(false);
-  const [compactActivated, setCompactActivated] = useState(false); // Track if compact has been activated
-  const [isMobile, setIsMobile] = useState(false);
-
-  // Hook to detect mobile screen size
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 600);
-    };
-    
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
+  const {
+    headerCompact,
+    isMobile,
+    activateCompactHeader,
+    updateHeaderForTab,
+    handleLogoClick: handleHeaderLogoClick,
+    resetHeaderState,
+  } = useHeaderState();
 
   const handleNextWithPlantName = async () => {
-    // On mobile, activate compact header on first navigation
-    if (isMobile && !compactActivated) {
-      setHeaderCompact(true);
-      setCompactActivated(true);
-    }
+    activateCompactHeader();
     navigateForward(1, files.length, !!diagnosis);
     await identifyPlantName();
   };
@@ -64,43 +54,17 @@ const Home: NextPage = () => {
   const handleReset = () => {
     resetForm();
     resetNavigation();
-    setHeaderCompact(false); // Back to full header
-    setCompactActivated(false); // Reset compact activation state
+    resetHeaderState();
   };
 
   const handleTabChange = (tab: typeof activeTab) => {
-    // Only allow navigation to previously reached tabs (backward navigation)
     navigateViaButton(tab);
-    
-    // Header behavior logic:
-    // - On desktop: always keep header big
-    // - On mobile: once compact is activated, keep it compact until reset
-    if (isMobile) {
-      if (tab > 0 && !compactActivated) {
-        // First time navigating to tab 1+ on mobile
-        setHeaderCompact(true);
-        setCompactActivated(true);
-      } else if (compactActivated) {
-        // Keep compact if it was already activated
-        setHeaderCompact(true);
-      } else {
-        // Tab 0 and compact not yet activated
-        setHeaderCompact(false);
-      }
-    } else {
-      // Desktop: always keep header big
-      setHeaderCompact(false);
-    }
+    updateHeaderForTab(tab);
   };
 
   const handleLogoClick = () => {
-    // Navigate back to first tab without resetting form data
     navigateViaButton(0);
-    
-    // Adjust header behavior for mobile when going back to tab 0
-    if (isMobile && compactActivated) {
-      setHeaderCompact(false);
-    }
+    handleHeaderLogoClick();
   };
 
   const renderTabContent = () => {
@@ -145,29 +109,7 @@ const Home: NextPage = () => {
   return (
     <div className={styles.container}>
       <main className={styles.main}>
-        <header className={`${styles.header} ${headerCompact ? styles.headerCompact : ''}`}>
-          <div className={styles.logoTitleContainer}>
-            <img 
-              src="/logo.png" 
-              alt="Plant Debug Logo" 
-              className={styles.logo}
-              onClick={handleLogoClick}
-              style={{ cursor: 'pointer' }}
-            />
-            <div className={styles.titleContainer}>
-              <h1 
-                className={styles.title}
-                onClick={handleLogoClick}
-                style={{ cursor: 'pointer' }}
-              >
-                Plant Debugger
-              </h1>
-            </div>
-          </div>
-          <p className={styles.description}>
-            Upload pictures of your sad plant and provide some context to start debugging.
-          </p>
-        </header>
+        <Header isCompact={headerCompact} onLogoClick={handleLogoClick} />
 
         <TabBar
           activeTab={activeTab}

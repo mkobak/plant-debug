@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { DiagnosisFormState } from '../types';
 import styles from '../styles/ContextForm.module.css';
-import { WATERING_FREQUENCY_LABELS, WATERING_AMOUNT_LABELS, SUNLIGHT_LABELS } from '../constants/sliderLabels';
+import { WATERING_FREQUENCY_LABELS, WATERING_AMOUNT_LABELS, SUNLIGHT_LABELS } from '../utils/constants';
 
 interface ContextFormProps {
   formState: DiagnosisFormState;
