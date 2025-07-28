@@ -7,12 +7,14 @@ interface DownloadPDFButtonProps {
   diagnosis: DiagnosisResponse;
   files: File[];
   className?: string;
+  style?: React.CSSProperties;
 }
 
 export const DownloadPDFButton: React.FC<DownloadPDFButtonProps> = ({
   diagnosis,
   files,
-  className
+  className,
+  style
 }) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -33,34 +35,15 @@ export const DownloadPDFButton: React.FC<DownloadPDFButtonProps> = ({
   };
 
   return (
-    <div style={{ position: 'relative' }}>
-      <Button
-        variant="primary"
-        onClick={handleDownload}
-        disabled={isGenerating}
-        className={className}
-        title="Download a PDF report of the plant diagnosis"
-      >
-        {isGenerating ? 'Generating report...' : 'Download'}
-      </Button>
-      {error && (
-        <div style={{
-          position: 'absolute',
-          top: '100%',
-          right: '0',
-          marginTop: '5px',
-          padding: '5px 10px',
-          backgroundColor: '#ffebee',
-          color: '#c62828',
-          borderRadius: '4px',
-          fontSize: '12px',
-          whiteSpace: 'nowrap',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-          zIndex: 1000
-        }}>
-          {error}
-        </div>
-      )}
-    </div>
+    <Button
+      variant="primary"
+      onClick={handleDownload}
+      disabled={isGenerating}
+      title={error || "Download a PDF report of the plant diagnosis"}
+      style={style}
+      className={className}
+    >
+      {isGenerating ? 'Generating report...' : 'Download'}
+    </Button>
   );
 };
