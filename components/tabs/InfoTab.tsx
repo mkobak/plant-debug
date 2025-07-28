@@ -25,9 +25,9 @@ export const InfoTab: React.FC<InfoTabProps> = ({
   const isPlantIdentified = formState.plantType.trim() !== '';
   
   return (
-    <form onSubmit={onSubmit} className={styles.form}>
-      <div className={styles.formSection}>
-        <h2 className={styles.sectionTitle}>2. Provide details (optional)</h2>
+    <form onSubmit={onSubmit} className={`base-tab-form ${styles.form}`}>
+      <div className={`base-form-section ${styles.formSection}`}>
+        <h2 className={`base-section-title ${styles.sectionTitle}`}>2. Provide details (optional)</h2>
         <ContextForm
           formState={formState}
           onFormChange={onFormChange}

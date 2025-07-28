@@ -1,33 +1,15 @@
 .form {
-  width: 100%;
-  max-width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  background: transparent;
-  padding: 0;
-  border-radius: 0;
-  box-shadow: none;
-  border: none;
+  /* Base tab form styles applied via JavaScript className combination */
 }
 
 .formSection {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  width: 100%;
+  /* Base form section styles applied via JavaScript className combination */
 }
 
 .sectionTitle {
-  font-size: 1.1rem;
-  color: var(--grey-800);
-  margin: 0;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--grey-300);
+  /* Base section title styles applied via JavaScript className combination */
 }
 
 .tip {
-  margin-bottom: 0.5rem;
-  color: var(--grey-600);
-  font-size: 0.98em;
+  /* Base tip styles applied via JavaScript className combination */
 }

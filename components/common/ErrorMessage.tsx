@@ -8,7 +8,7 @@ interface ErrorMessageProps {
 
 export const ErrorMessage: React.FC<ErrorMessageProps> = ({ message, className = '' }) => {
   return (
-    <div className={`${styles.error} ${className}`}>
+    <div className={`base-card-error ${styles.error} ${className}`}>
       {message}
     </div>
   );

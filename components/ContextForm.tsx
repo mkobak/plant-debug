@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { DiagnosisFormState } from '../types';
 import styles from '../styles/ContextForm.module.css';
-import { WATERING_FREQUENCY_LABELS, WATERING_AMOUNT_LABELS, SUNLIGHT_LABELS } from '../constants/sliderLabels';
+import { WATERING_FREQUENCY_LABELS, WATERING_AMOUNT_LABELS, SUNLIGHT_LABELS } from '../utils/constants';
 
 interface ContextFormProps {
   formState: DiagnosisFormState;
@@ -79,7 +79,7 @@ const ContextForm: React.FC<ContextFormProps> = ({ formState, onFormChange, plan
         placeholder=""
         value={formState.plantType}
         onChange={onFormChange}
-        className={`${styles.input} ${plantNameLoading ? styles.inputDisabled : ''}`}
+        className={`base-input ${styles.input} ${plantNameLoading ? styles.inputDisabled : ''}`}
         aria-label="Plant Type"
         disabled={plantNameLoading || plantNameDisabled}
       />
@@ -94,7 +94,7 @@ const ContextForm: React.FC<ContextFormProps> = ({ formState, onFormChange, plan
         placeholder="e.g., Leaves are turning yellow and have brown spots."
         value={formState.description}
         onChange={onFormChange}
-        className={`${styles.input} ${styles.textarea}`}
+        className={`base-input ${styles.input} ${styles.textarea}`}
         aria-label="Description"
         rows={2}
       />
@@ -239,7 +239,7 @@ const ContextForm: React.FC<ContextFormProps> = ({ formState, onFormChange, plan
               placeholder="e.g., potting mix, cactus mix, hydroponic, etc."
               value={formState.soilType}
               onChange={onFormChange}
-              className={styles.input}
+              className="base-input"
             />
 
             <label htmlFor="potDetails" className={styles.detailLabel}>Pot details</label>
@@ -250,7 +250,7 @@ const ContextForm: React.FC<ContextFormProps> = ({ formState, onFormChange, plan
               placeholder="Size, drainage, repotting history"
               value={formState.potDetails}
               onChange={onFormChange}
-              className={styles.input}
+              className="base-input"
             />
 
             <label htmlFor="fertilizer" className={styles.detailLabel}>Fertilizer use</label>
@@ -261,7 +261,7 @@ const ContextForm: React.FC<ContextFormProps> = ({ formState, onFormChange, plan
               placeholder="Type, frequency, last applied"
               value={formState.fertilizer}
               onChange={onFormChange}
-              className={styles.input}
+              className="base-input"
             />
 
             <label htmlFor="humidity" className={styles.detailLabel}>Humidity</label>
@@ -272,7 +272,7 @@ const ContextForm: React.FC<ContextFormProps> = ({ formState, onFormChange, plan
               placeholder="e.g., 40%, low, medium, high"
               value={formState.humidity}
               onChange={onFormChange}
-              className={styles.input}
+              className="base-input"
             />
 
             <label htmlFor="temperature" className={styles.detailLabel}>Temperature range</label>
@@ -283,7 +283,7 @@ const ContextForm: React.FC<ContextFormProps> = ({ formState, onFormChange, plan
               placeholder="e.g., 18-24°C"
               value={formState.temperature}
               onChange={onFormChange}
-              className={styles.input}
+              className="base-input"
             />
 
             <label htmlFor="symptoms" className={styles.detailLabel}>Symptoms (select all that apply)</label>
@@ -323,7 +323,7 @@ const ContextForm: React.FC<ContextFormProps> = ({ formState, onFormChange, plan
               placeholder="Recent changes in care, location, etc."
               value={formState.recentChanges}
               onChange={onFormChange}
-              className={styles.input}
+              className="base-input"
             />
 
             <label htmlFor="plantAge" className={styles.detailLabel}>Plant age</label>
@@ -334,7 +334,7 @@ const ContextForm: React.FC<ContextFormProps> = ({ formState, onFormChange, plan
               placeholder="Approximate age of the plant"
               value={formState.plantAge}
               onChange={onFormChange}
-              className={styles.input}
+              className="base-input"
             />
           </div>
         )}
