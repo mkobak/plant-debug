@@ -1,9 +1,8 @@
 import React from 'react';
 import { DiagnosisResult } from '../DiagnosisResult';
-import { LoadingSpinner, ErrorMessage, Button } from '../common';
+import { LoadingSpinner, ErrorMessage, Button, ButtonGroup } from '../common';
 import { DownloadPDFButton } from '../DownloadPDFButton';
 import { DiagnosisResponse, IntermediateDiagnosisResponse } from '../../types';
-import styles from '../../styles/ResultsTab.module.css';
 
 interface ResultsTabProps {
   diagnosis: DiagnosisResponse | null;
@@ -23,35 +22,40 @@ export const ResultsTab: React.FC<ResultsTabProps> = ({
   files
 }) => {
   return (
-    <div className={styles.container}>
-      <div className={styles.formSection}>
-        <h2 className={styles.sectionTitle}>3. Debugging results</h2>
-      </div>
-      <div className={styles.content}>
-        {isLoading && !intermediateDiagnosis && (
-          <LoadingSpinner message="Debugging your plant... this may take a moment." />
+    <div className="base-tab-form">
+      <div className="base-form-section">
+        <h2 className="base-section-title">3. Debugging results</h2>
+        {(isLoading || error || diagnosis) && (
+          <div>
+            {isLoading && !intermediateDiagnosis && (
+              <LoadingSpinner message="Debugging your plant... this may take a moment." />
+            )}
+            {isLoading && intermediateDiagnosis && (
+              <LoadingSpinner 
+                message={`Investigating possible bugs: ${intermediateDiagnosis.rankedDiagnoses.join(', ')}...`} 
+              />
+            )}
+            {error && <ErrorMessage message={error} />}
+            {diagnosis && <DiagnosisResult diagnosis={diagnosis} files={files} />}
+          </div>
         )}
-        {isLoading && intermediateDiagnosis && (
-          <LoadingSpinner 
-            message={`Investigating possible bugs: ${intermediateDiagnosis.rankedDiagnoses.join(', ')}...`} 
-          />
-        )}
-        {error && <ErrorMessage message={error} />}
-        {diagnosis && <DiagnosisResult diagnosis={diagnosis} files={files} />}
       </div>
       
-      <div className={styles.actions}>
+      <ButtonGroup>
         <Button variant="reset" onClick={onReset}>
           Reset
         </Button>
-        {diagnosis && (
+        {diagnosis ? (
           <DownloadPDFButton 
             diagnosis={diagnosis} 
             files={files}
-            className={styles.downloadButton}
           />
+        ) : (
+          <Button disabled>
+            Download
+          </Button>
         )}
-      </div>
+      </ButtonGroup>
     </div>
   );
 };
