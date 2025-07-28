@@ -1,7 +1,3 @@
-.button {
-  /* Base button styles applied via JavaScript className combination */
-}
-
 .primary {
   color: #fff;
   background-color: var(--green-primary);

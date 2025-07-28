@@ -90,8 +90,13 @@
 
 .secondaryDiagnosisSection {
   margin-top: 1rem !important;
-  padding-top: 1rem;
-  border-top: 2px solid var(--grey-300);
+}
+
+.diagnosisSeparator {
+  height: 2px;
+  background-color: var(--grey-300);
+  margin: 1rem 0;
+  border: none;
 }
 
 .primaryDiagnosisHeader {
@@ -135,20 +140,25 @@
   font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
 }
 
-.summarySection {
-  /* Uses base-card-info via JavaScript className combination */
-}
-
 .summarySection h3 {
   color: var(--primary-color) !important;
   border-bottom: none !important;
   margin-top: 0 !important;
-  margin-bottom: 0.5rem !important;
+  margin-bottom: 0.25rem !important;
   font-size: 1.2rem !important;
 }
 
 .summarySection :global(ul) {
   margin-bottom: 0;
+  margin-top: 0 !important;
+}
+
+.summarySection :global(p) {
+  margin-top: 0 !important;
+}
+
+.summarySection :global(*:first-child) {
+  margin-top: 0 !important;
 }
 
 .summarySection :global(li) {
@@ -165,6 +175,7 @@
 .subsection.summarySection h3 {
   font-size: 1.1rem !important;
   margin-top: 0 !important;
+  margin-bottom: 0.25rem !important;
 }
 
 /* Image preview styles */

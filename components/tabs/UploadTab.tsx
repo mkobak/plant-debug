@@ -1,7 +1,6 @@
 import React from 'react';
 import ImageUploader from '../ImageUploader';
 import { Button, ButtonGroup } from '../common';
-import styles from '../../styles/UploadTab.module.css';
 
 interface UploadTabProps {
   files: File[];
@@ -19,10 +18,10 @@ export const UploadTab: React.FC<UploadTabProps> = ({
   plantNameLoading
 }) => {
   return (
-    <form className={`base-tab-form ${styles.form}`} onSubmit={e => e.preventDefault()}>
-      <div className={`base-form-section ${styles.formSection}`}>
-        <h2 className={`base-section-title ${styles.sectionTitle}`}>1. Upload images</h2>
-        <div className={`base-tip ${styles.tip}`}>
+    <form className="base-tab-form" onSubmit={e => e.preventDefault()}>
+      <div className="base-form-section">
+        <h2 className="base-section-title">1. Upload images</h2>
+        <div className="base-tip">
           <strong>Tip:</strong> For best results, upload clear, well-lit photos showing the affected parts of your plant.
         </div>
         <ImageUploader files={files} onFilesChange={onFilesChange} />

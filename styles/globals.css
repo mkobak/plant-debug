@@ -317,12 +317,12 @@ input[type="range"].active:active::-ms-thumb {
 }
 
 .slider-reset-btn::before {
-  content: "×";
+  content: "⨯"; 
   font-size: 13px;
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -60%);
 }
 
 .slider-reset-btn:hover {
@@ -353,15 +353,6 @@ input[type="range"].active:active::-ms-thumb {
     height: 16px;
     font-size: 11px;
     margin-left: 4px;
-  }
-}
-
-@media (max-width: 480px) {
-  .slider-reset-btn {
-    width: 14px;
-    height: 14px;
-    font-size: 10px;
-    margin-left: 3px;
   }
 }
 

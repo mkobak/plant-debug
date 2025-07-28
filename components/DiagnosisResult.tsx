@@ -120,8 +120,10 @@ export const DiagnosisResult: React.FC<DiagnosisResultProps> = ({ diagnosis, fil
       </div>
 
       {diagnosis.secondaryDiagnosis && diagnosis.secondaryDiagnosis.trim() && (
-        <div className={`${styles.section} ${styles.secondaryDiagnosisSection}`}>
-          <div className={styles.header}>
+        <>
+          <div className={styles.diagnosisSeparator}></div>
+          
+          <div className={`${styles.header} ${styles.secondaryDiagnosisHeader}`}>
             <h3 className={styles.secondaryHeaderTitle}>Secondary Diagnosis: {diagnosis.secondaryDiagnosis}</h3>
           </div>
           <div className={styles.header}>
@@ -134,31 +136,35 @@ export const DiagnosisResult: React.FC<DiagnosisResultProps> = ({ diagnosis, fil
               </span>
             )}
           </div>
+
           {diagnosis.secondarySummary && (
-            <div className={`base-card-info ${styles.subsection} ${styles.summarySection}`}>
+            <div className={`base-card-info ${styles.section} ${styles.summarySection}`}>
               <h3>Summary</h3>
               <ReactMarkdown>{diagnosis.secondarySummary}</ReactMarkdown>
             </div>
           )}
+
           {diagnosis.secondaryReasoning && (
-            <div className={styles.subsection}>
+            <div className={styles.section}>
               <h3>Reasoning</h3>
               <ReactMarkdown>{diagnosis.secondaryReasoning}</ReactMarkdown>
             </div>
           )}
+
           {diagnosis.secondaryTreatmentPlan && (
-            <div className={styles.subsection}>
+            <div className={styles.section}>
               <h3>Treatment Plan</h3>
               <ReactMarkdown>{diagnosis.secondaryTreatmentPlan}</ReactMarkdown>
             </div>
           )}
+
           {diagnosis.secondaryPreventionTips && (
-            <div className={styles.subsection}>
+            <div className={styles.section}>
               <h3>Prevention Tips</h3>
               <ReactMarkdown>{diagnosis.secondaryPreventionTips}</ReactMarkdown>
             </div>
           )}
-        </div>
+        </>
       )}
 
       {/* Image Modal */}

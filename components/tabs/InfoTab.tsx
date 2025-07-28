@@ -2,7 +2,6 @@ import React from 'react';
 import ContextForm from '../ContextForm';
 import { Button, ButtonGroup } from '../common';
 import { DiagnosisFormState } from '../../types';
-import styles from '../../styles/InfoTab.module.css';
 
 interface InfoTabProps {
   formState: DiagnosisFormState;
@@ -25,9 +24,9 @@ export const InfoTab: React.FC<InfoTabProps> = ({
   const isPlantIdentified = formState.plantType.trim() !== '';
   
   return (
-    <form onSubmit={onSubmit} className={`base-tab-form ${styles.form}`}>
-      <div className={`base-form-section ${styles.formSection}`}>
-        <h2 className={`base-section-title ${styles.sectionTitle}`}>2. Provide details (optional)</h2>
+    <form onSubmit={onSubmit} className="base-tab-form">
+      <div className="base-form-section">
+        <h2 className="base-section-title">2. Provide details (optional)</h2>
         <ContextForm
           formState={formState}
           onFormChange={onFormChange}

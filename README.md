@@ -82,19 +82,15 @@ App runs locally at `http://localhost:3000`
 ├── public/               # Static assets
 │   └── logo.png          # Main logo
 ├── styles/               # CSS modules
-│   ├── globals.css       # Global styles (variables, sliders, radio buttons)
+│   ├── globals.css       # Global styles (variables, sliders, radio buttons, base component styles)
 │   ├── Home.module.css   # Main page styles
 │   ├── Button.module.css # Button component styles
-│   ├── ButtonGroup.module.css # Button group styles
 │   ├── ContextForm.module.css # Context form styles
 │   ├── DiagnosisResult.module.css # Results display styles
-│   ├── ErrorMessage.module.css # Error message styles
 │   ├── ImageUploader.module.css # Image uploader styles
-│   ├── InfoTab.module.css # Info tab styles
 │   ├── LoadingSpinner.module.css # Loading spinner styles
 │   ├── ResultsTab.module.css # Results tab styles
-│   ├── TabBar.module.css # Tab bar styles
-│   └── UploadTab.module.css # Upload tab styles
+│   └── TabBar.module.css # Tab bar styles
 ├── types/                # TypeScript type definitions
 │   └── index.ts          # Main type definitions
 ├── utils/                # Utility functions

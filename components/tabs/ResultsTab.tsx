@@ -1,6 +1,7 @@
 import React from 'react';
 import { DiagnosisResult } from '../DiagnosisResult';
 import { LoadingSpinner, ErrorMessage, Button } from '../common';
+import { DownloadPDFButton } from '../DownloadPDFButton';
 import { DiagnosisResponse, IntermediateDiagnosisResponse } from '../../types';
 import styles from '../../styles/ResultsTab.module.css';
 
@@ -43,6 +44,13 @@ export const ResultsTab: React.FC<ResultsTabProps> = ({
         <Button variant="reset" onClick={onReset}>
           Reset
         </Button>
+        {diagnosis && (
+          <DownloadPDFButton 
+            diagnosis={diagnosis} 
+            files={files}
+            className={styles.downloadButton}
+          />
+        )}
       </div>
     </div>
   );

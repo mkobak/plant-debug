@@ -1,5 +1,4 @@
 import React from 'react';
-import styles from '../../styles/ButtonGroup.module.css';
 
 interface ButtonGroupProps {
   children: React.ReactNode;
@@ -8,7 +7,7 @@ interface ButtonGroupProps {
 
 export const ButtonGroup: React.FC<ButtonGroupProps> = ({ children, className = '' }) => {
   return (
-    <div className={`base-button-group ${styles.buttonGroup} ${className}`}>
+    <div className={`base-button-group ${className}`}>
       {children}
     </div>
   );

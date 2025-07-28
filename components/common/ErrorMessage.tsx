@@ -1,5 +1,4 @@
 import React from 'react';
-import styles from '../../styles/ErrorMessage.module.css';
 
 interface ErrorMessageProps {
   message: string;
@@ -8,7 +7,7 @@ interface ErrorMessageProps {
 
 export const ErrorMessage: React.FC<ErrorMessageProps> = ({ message, className = '' }) => {
   return (
-    <div className={`base-card-error ${styles.error} ${className}`}>
+    <div className={`base-card-error ${className}`}>
       {message}
     </div>
   );
