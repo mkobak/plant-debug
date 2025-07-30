@@ -86,7 +86,7 @@ export const DiagnosisResult: React.FC<DiagnosisResultProps> = ({ diagnosis, fil
       )}
       
       <div className={`${styles.header} ${styles.primaryDiagnosisHeader}`}>
-        <h3 className={styles.headerTitle}>Primary Diagnosis: {diagnosis.primaryDiagnosis}</h3>
+        <h3 className={styles.headerTitle}>Diagnosis: {diagnosis.primaryDiagnosis}</h3>
       </div>
       <div className={styles.header}>
         <span
@@ -124,7 +124,7 @@ export const DiagnosisResult: React.FC<DiagnosisResultProps> = ({ diagnosis, fil
           <div className={styles.diagnosisSeparator}></div>
           
           <div className={`${styles.header} ${styles.secondaryDiagnosisHeader}`}>
-            <h3 className={styles.secondaryHeaderTitle}>Secondary Diagnosis: {diagnosis.secondaryDiagnosis}</h3>
+            <h3 className={styles.secondaryHeaderTitle}>Alternative Diagnosis: {diagnosis.secondaryDiagnosis}</h3>
           </div>
           <div className={styles.header}>
             {diagnosis.secondaryConfidence && (

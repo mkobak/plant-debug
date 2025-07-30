@@ -38,8 +38,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         );
         
         // Prompt for plant name only
-        const prompt = `Identify the plant species in the provided image(s). Only reply with the plant name, nothing else. Use the format 'Common Name (Scientific Name)'. If no plant is detected or the plant name cannot be identified with high certainty, reply 'Unknown'.`;
-        
+        const prompt = `Identify the plant in the provided image(s). Only reply with the plant name, nothing else. 
+        Use the name that an average person familiar with plants would use.
+        E.g., for Monstera Deliciosa, reply 'Monstera' or 'Monstera Deliciosa' and not 'Swiss Cheese Plant', since the scientific name is commonly known.
+        However, for a plant with an unknown scientific name and a well-known common name, use the common name.
+        If no plant is detected, or there are clearly multiple plants on the pictures, or the plant name cannot be identified with high certainty, reply with a blank string ''.`;
+
         const result = await modelFlashLite.generateContent({
           contents: [
             {

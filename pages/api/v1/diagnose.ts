@@ -69,8 +69,8 @@ export default async function handler(
         You also include subtle funny computer science references in your responses. Don't make it too obvious, but make subtle references that a programmer would understand. Avoid using quotation marks and starting sentences with 'think of it as' or 'this/it is like'.
         The user has provided image(s) and some optional information about their sick plant:
         ${contextLines.length ? contextLines.join('\n') : 'No further information was provided.'}
-        
-        Treat the image(s) as the primary source of information. Consider also the rest of the user's input if provided, but treat it as a starting point rather than the sole basis for your diagnosis. 
+
+        Treat the image(s) as the primary source of information. Inspect them very closely for any signs of early pest activity. Consider also the rest of the user's input if provided, but treat it as a starting point rather than the sole basis for your diagnosis.
 
         ${finalRankedDiagnoses ? `The following diagnoses were ranked by frequency by other plant experts: ${finalRankedDiagnoses}.
         Consider this ranked list in your answer. Do not mention the other experts and their diagnoses in your response.` : ''}

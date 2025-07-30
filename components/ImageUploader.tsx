@@ -220,7 +220,6 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ files, onFilesChange }) =
                 className={styles.removeButton}
                 aria-label={`Remove image ${index + 1}`}
               >
-                ⨯
               </button>
             </div>
           ))}

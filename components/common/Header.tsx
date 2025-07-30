@@ -26,7 +26,7 @@ export const Header: React.FC<HeaderProps> = ({ isCompact, onLogoClick }) => {
         </div>
       </div>
       <p className={styles.description}>
-        Upload pictures of your sad plant and provide some context to start debugging.
+        Upload photos of your sad plant and provide some context to start debugging.
       </p>
     </header>
   );

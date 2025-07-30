@@ -9,7 +9,7 @@ interface TabBarProps {
 }
 
 const TAB_NAMES = [
-  '1. Upload \n images',
+  '1. Upload \n photos',
   '2. Provide \n details',
   '3. Debugging \n results',
 ];
