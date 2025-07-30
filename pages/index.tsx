@@ -42,7 +42,7 @@ const Home: NextPage = () => {
   const handleNextWithPlantName = async () => {
     activateCompactHeader();
     navigateForward(1, files.length, !!diagnosis);
-    await identifyPlantName();
+    // Plant identification now happens automatically when images are uploaded
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

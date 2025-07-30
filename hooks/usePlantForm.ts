@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { DiagnosisFormState, DiagnosisResponse, IntermediateDiagnosisResponse } from '../types';
 import { WATERING_FREQUENCY_LABELS, WATERING_AMOUNT_LABELS, SUNLIGHT_LABELS } from '../utils/constants';
 
@@ -30,6 +30,67 @@ export const usePlantForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [plantNameLoading, setPlantNameLoading] = useState(false);
+  
+  // Ref to track if plant identification is in progress to avoid duplicate calls
+  const identificationInProgress = useRef(false);
+  const identificationTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  const identifyPlantName = useCallback(async () => {
+    if (files.length === 0 || identificationInProgress.current) return;
+    
+    identificationInProgress.current = true;
+    setPlantNameLoading(true);
+    setError(null);
+    
+    try {
+      const formData = new FormData();
+      files.forEach((file) => {
+        formData.append('images', file);
+      });
+      
+      const response = await fetch('/api/v1/identify-plant', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        throw new Error('Could not identify plant name');
+      }
+      
+      const data = await response.json();
+      setFormState((prev) => ({ ...prev, plantType: data.plantName || '' }));
+    } catch (err: any) {
+      setError('Could not identify plant name');
+    } finally {
+      setPlantNameLoading(false);
+      identificationInProgress.current = false;
+    }
+  }, [files]);
+
+  // Auto-identify plant when files change with a small delay to debounce rapid uploads
+  useEffect(() => {
+    // Clear any existing timeout
+    if (identificationTimeout.current) {
+      clearTimeout(identificationTimeout.current);
+    }
+
+    if (files.length > 0 && !identificationInProgress.current) {
+      // Add a small delay to debounce rapid file uploads
+      identificationTimeout.current = setTimeout(() => {
+        identifyPlantName();
+      }, 100);
+    } else if (files.length === 0) {
+      // Clear plant name when no images are present
+      setFormState(prev => ({ ...prev, plantType: '' }));
+    }
+
+    // Cleanup timeout on unmount
+    return () => {
+      if (identificationTimeout.current) {
+        clearTimeout(identificationTimeout.current);
+      }
+    };
+  }, [files, identifyPlantName]);
 
   const handleFormChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -59,36 +120,6 @@ export const usePlantForm = () => {
         ? SUNLIGHT_LABELS[parseInt(formState.sunlight) - 1] || ''
         : '',
     };
-  };
-
-  const identifyPlantName = async () => {
-    if (files.length === 0) return;
-    
-    setPlantNameLoading(true);
-    setError(null);
-    
-    try {
-      const formData = new FormData();
-      files.forEach((file) => {
-        formData.append('images', file);
-      });
-      
-      const response = await fetch('/api/v1/identify-plant', {
-        method: 'POST',
-        body: formData,
-      });
-      
-      if (!response.ok) {
-        throw new Error('Could not identify plant name');
-      }
-      
-      const data = await response.json();
-      setFormState((prev) => ({ ...prev, plantType: data.plantName || '' }));
-    } catch (err: any) {
-      setError('Could not identify plant name');
-    } finally {
-      setPlantNameLoading(false);
-    }
   };
 
   const submitDiagnosis = async () => {

@@ -68,7 +68,6 @@ export const ImageModal: React.FC<ImageModalProps> = ({
                 onClick={onPrevious}
                 aria-label="Previous image"
               >
-                ❮
               </button>
             )}
             {onNext && currentIndex !== undefined && totalImages && currentIndex < totalImages - 1 && (
@@ -77,7 +76,6 @@ export const ImageModal: React.FC<ImageModalProps> = ({
                 onClick={onNext}
                 aria-label="Next image"
               >
-                ❯
               </button>
             )}
           </>
@@ -94,7 +92,6 @@ export const ImageModal: React.FC<ImageModalProps> = ({
             onClick={onClose}
             aria-label="Close image preview"
           >
-            ⨯
           </button>
           
           {/* Image counter */}

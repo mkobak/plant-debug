@@ -29,7 +29,7 @@ export const initializeGemini = () => {
   return {
     modelPro: genAI.getGenerativeModel({ model: 'gemini-2.5-flash' }), // Using Flash as Pro for now
     modelFlash: genAI.getGenerativeModel({ model: 'gemini-2.5-flash' }),
-    modelFlashLite: genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite-preview-06-17' }),
+    modelFlashLite: genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite' }),
   };
 };
 
@@ -114,7 +114,8 @@ export const getInitialDiagnosis = async (
 ) => {
   const diagnosisPrompt = `
     You are an expert botanist. Based on the images and context, what are the most likely possible diagnoses for the plant's issue? Provide up to three diagnoses if multiple options seem likely.
-    Only reply with the concrete diagnosis names, separated by commas, and nothing else. If no plant appears in the images, respond with 'No plant detected'. If the plant is healthy, respond with 'Plant is healthy'.
+    Only reply with the concrete diagnosis names, separated by commas, and nothing else. Inspect the images very closely for any signs of early issues, such as pest activity. 
+    If you can't find any issues with the plant, respond with 'No bugs identified'. If no plant appears in the images, respond with 'No plant detected'.
     User provided context: \n\n${contextLines.length ? contextLines.join('\n') : 'No further information was provided.'}
   `;
 
@@ -204,17 +205,17 @@ export const generateSummary = async (model: any, diagnosis: any) => {
   try {
     // Generate primary summary
     const primarySummaryPrompt = `
-      You are a plant expert. Based on the primary diagnosis details below, create a concise bullet-point summary of the most important information.
+      You are a plant expert. Based on the diagnosis details below, create a concise bullet-point summary of the most important information.
       
       Focus on:
       • Key findings (what's wrong and why)
       • Essential treatment steps (prioritized)
       • Critical prevention measures
       
-      Keep it concise - maximum 4-5 bullet points total. Use clear, actionable language.
+      Keep it concise - maximum 4 bullet points total. Use clear, actionable language.
       Output ONLY the bullet points, no introductory text or subtitles.
       
-      Primary diagnosis details:
+      Diagnosis details:
       Diagnosis: ${diagnosis.primaryDiagnosis} (${diagnosis.primaryConfidence} confidence)
       Reasoning: ${diagnosis.primaryReasoning}
       Treatment: ${diagnosis.primaryTreatmentPlan}
@@ -242,14 +243,14 @@ export const generateSummary = async (model: any, diagnosis: any) => {
     let secondarySummary = "";
     if (diagnosis.secondaryDiagnosis && diagnosis.secondaryDiagnosis.trim()) {
       const secondarySummaryPrompt = `
-        You are a plant expert. Based on the secondary diagnosis details below, create a concise bullet-point summary of the most important information.
+        You are a plant expert. Based on the diagnosis details below, create a concise bullet-point summary of the most important information.
         
         Focus on:
         • Key findings (what's wrong and why)
         • Essential treatment steps (prioritized)
         • Critical prevention measures
         
-        Keep it concise - maximum 4-5 bullet points total. Use clear, actionable language.
+        Keep it concise - maximum 4 bullet points total. Use clear, actionable language.
         Output ONLY the bullet points, no introductory text or subtitles.
         
         Secondary diagnosis details:
@@ -303,14 +304,14 @@ export const getDiagnosisTools = () => {
                   plant: { type: "string", description: "Name of the plant in the pictures, both the common name and scientific name. If the user provided the name of the plant, verify it is correct. If it's not, provide the name of the plant that you identify from the pictures. Only provide the name of the plant and nothing else." },
                   primaryDiagnosis: { type: "string", description: "Most likely (primary) diagnosis based on the pictures and context." },
                   primaryConfidence: { type: "string", enum: ["High", "Medium", "Low"], description: "Confidence level in the primary diagnosis. Rate your confidence in your diagnosis realistically given the available information." },
-                  primaryReasoning: { type: "string", description: "Brief explanation of how the primary diagnosis was reached, referencing visual evidence and user context, in Markdown." },
-                  primaryTreatmentPlan: { type: "string", description: "Brief step-by-step guide for the user to resolve the issue in case of the primary diagnosis, in Markdown." },
-                  primaryPreventionTips: { type: "string", description: "Brief actionable advice to prevent recurrence in case of the primary diagnosis, in Markdown." },
+                  primaryReasoning: { type: "string", description: "Brief explanation of how the primary diagnosis was reached, referencing visual evidence and user context, in Markdown. Maximum 2 sentences." },
+                  primaryTreatmentPlan: { type: "string", description: "Brief step-by-step guide for the user to resolve the issue in case of the primary diagnosis, in Markdown. Maximum 3 bullet points." },
+                  primaryPreventionTips: { type: "string", description: "Brief actionable advice to prevent recurrence in case of the primary diagnosis, in Markdown. Maximum 3 bullet points." },
                   secondaryDiagnosis: { type: "string", description: "Secondary diagnosis in case there is another likely possibility of what the issue with the plant could be, other than the primary diagnosis." },
                   secondaryConfidence: { type: "string", enum: ["High", "Medium", "Low"], description: "Confidence level in the secondary diagnosis." },
-                  secondaryReasoning: { type: "string", description: "Brief explanation of how the secondary diagnosis was reached, referencing visual evidence and user context, in Markdown." },
-                  secondaryTreatmentPlan: { type: "string", description: "Brief step-by-step guide for the user to resolve the issue in case of the secondary diagnosis, in Markdown." },
-                  secondaryPreventionTips: { type: "string", description: "Brief actionable advice to prevent recurrence in case of the secondary diagnosis, in Markdown." }
+                  secondaryReasoning: { type: "string", description: "Brief explanation of how the secondary diagnosis was reached, referencing visual evidence and user context, in Markdown. Maximum 2 sentences." },
+                  secondaryTreatmentPlan: { type: "string", description: "Brief step-by-step guide for the user to resolve the issue in case of the secondary diagnosis, in Markdown. Maximum 3 bullet points." },
+                  secondaryPreventionTips: { type: "string", description: "Brief actionable advice to prevent recurrence in case of the secondary diagnosis, in Markdown. Maximum 3 bullet points." }
 
                 },
                 required: ["plant", "primaryDiagnosis", "primaryConfidence", "primaryReasoning", "primaryTreatmentPlan", "primaryPreventionTips"]

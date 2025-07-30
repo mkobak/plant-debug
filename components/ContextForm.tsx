@@ -129,7 +129,7 @@ const ContextForm: React.FC<ContextFormProps> = ({ formState, onFormChange, plan
           </div>
           {formState.pests && (
             <span 
-              className="slider-reset-btn"
+              className="slider-reset-btn slider-reset-section"
               onClick={() => resetRadio('pests')}
               title="Reset"
             >

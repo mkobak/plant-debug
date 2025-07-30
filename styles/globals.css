@@ -303,26 +303,32 @@ input[type="range"].active:active::-ms-thumb {
   border-radius: 50%;
   background: rgba(146, 146, 146, 0.3);
   color: #525252;
-  font-weight: 600;
-  line-height: 1;
   cursor: pointer;
   user-select: none;
   transition: all 0.2s ease;
   flex-shrink: 0;
-  text-align: center;
   opacity: 0.7;
   vertical-align: middle;
   padding: 0;
   position: relative;
 }
 
-.slider-reset-btn::before {
-  content: "⨯"; 
-  font-size: 13px;
+.slider-reset-btn::before,
+.slider-reset-btn::after {
+  content: '';
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -60%);
+  width: 8px;
+  height: 1.5px;
+  background-color: currentColor;
+  border-radius: 0.5px;
+}
+
+.slider-reset-btn::before {
+  transform: rotate(45deg);
+}
+
+.slider-reset-btn::after {
+  transform: rotate(-45deg);
 }
 
 .slider-reset-btn:hover {
@@ -341,18 +347,39 @@ input[type="range"].active:active::-ms-thumb {
 .slider-reset-section {
   width: 20px;
   height: 20px;
-  font-size: 14px;
   margin-left: 4px;
   margin-top: 0;
   flex-shrink: 0;
+}
+
+.slider-reset-section::before,
+.slider-reset-section::after {
+  width: 10px;
+  height: 2px;
 }
 
 @media (max-width: 768px) {
   .slider-reset-btn {
     width: 16px;
     height: 16px;
-    font-size: 11px;
     margin-left: 4px;
+  }
+  
+  .slider-reset-btn::before,
+  .slider-reset-btn::after {
+    width: 6px;
+    height: 1px;
+  }
+  
+  .slider-reset-section {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .slider-reset-section::before,
+  .slider-reset-section::after {
+    width: 8px;
+    height: 1px;
   }
 }
 
