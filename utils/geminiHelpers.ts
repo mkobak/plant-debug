@@ -27,7 +27,7 @@ export const initializeGemini = () => {
   }
 
   return {
-    modelPro: genAI.getGenerativeModel({ model: 'gemini-2.5-flash' }), // Using Flash as Pro for now
+    modelPro: genAI.getGenerativeModel({ model: 'gemini-2.5-pro' }),
     modelFlash: genAI.getGenerativeModel({ model: 'gemini-2.5-flash' }),
     modelFlashLite: genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite' }),
   };
